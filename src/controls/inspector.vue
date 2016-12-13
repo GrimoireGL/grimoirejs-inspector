@@ -41,12 +41,7 @@ export default {
     updated:function(){
       InspectorUI.removeAllFolder();
       const components = this.nodeModel.components;
-      for(let i = 0; i < components.length; i++){
-        const c = components[i];
-        const f = InspectorUI.addFolder(c.name);
-        f.closed = false;
-        AttributeController.set(f,c.attributes);
-      }
+      AttributeController.set(components);
     }
 }
 </script>

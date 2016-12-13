@@ -1,18 +1,10 @@
 var connections = {};
-var cacheLog = {};
 chrome.runtime.onConnect.addListener(function(port) {
 
     // devTools側からのリスナー
     var devtoolListener = function(message, sender, sendResponse) {
         if (message.name == "init") {
             connections[message.tabId] = port;
-            if (cacheLog[message.tabId]) {
-                const l = cacheLog[message.tabId];
-                for (let i = 0; i < l.length; i++) {
-                    port.postMessage(l[i]);
-                }
-                l.splice(0, cacheLog[tabId].length);
-            }
             return;
         } else {
             if (message.$source === "grimoire-inspector-dev-tool") {

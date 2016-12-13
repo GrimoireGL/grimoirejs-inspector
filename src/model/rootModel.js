@@ -18,9 +18,11 @@ class RootModel {
             this.nodeModels = [];
             this.scriptElements = [];
             this.nodeModel = new NodeModel();
-            MessageObserver.post({
-              type:"sync-devtool"
-            });
+            if (this.isNotFirstLoad) {
+                MessageObserver.post({
+                    type: "sync-devtool"
+                });
+            }
         });
         MessageObserver.on("new-tree", (m) => {
             this.contextLoaded = true;
@@ -39,8 +41,9 @@ class RootModel {
             this.updateCurrentNode(index);
         });
         MessageObserver.post({
-          type:"sync-devtool"
+            type: "sync-devtool"
         });
+        this.isNotFirstLoad = true;
     }
 
     updateTreeLabels() {

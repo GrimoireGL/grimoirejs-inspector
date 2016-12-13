@@ -1,5 +1,6 @@
 import MessageManager from "./MessageManager";
 import ObjectConverter from "./ObjectConverter";
+import AttributeWatcher from "./AttributeWatcher";
 MessageManager.on("sync-devtool", function() {
     if(!!window.GrimoireJS) {
         function observeRoot(element) {
@@ -27,6 +28,7 @@ MessageManager.on("sync-devtool", function() {
         }
 
         MessageManager.on("fetch-node", function(m) {
+            AttributeWatcher.removeHandlers();
             const node = window.GrimoireJS.nodeDictionary[m.key];
             if (!node) {
                 return;
@@ -39,6 +41,7 @@ MessageManager.on("sync-devtool", function() {
                 id: node.element.id,
                 components: components
             });
+            AttributeWatcher.watch(node);
         });
 
         for (let key in window.GrimoireJS.rootNodes) {
