@@ -14,11 +14,18 @@
     <h2>
       {{cModel.name}}
     </h2>
+    <div v-for="attr in cModel.attributes">
+      <NodeAttribute :attribute="attr"/>
+    </div>
   </div>
 </template>
 
 <script>
+import NodeAttribute from "./node-attribute.vue";
 export default {
+    components:{
+      NodeAttribute:NodeAttribute
+    },
     props: ["cModel"]
 }
 </script>

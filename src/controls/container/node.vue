@@ -7,64 +7,68 @@ p.node-tag
   white-space:nowrap
   &:hover
     background-color:#704D35
+span.node-tag-expander
+  cursor:pointer
+  color:dimgray
+  font-size:10px
 </style>
 <template>
 <div>
-    <p class="node-tag" v-on:click="toggle">
-        <span>&lt;</span>
-        <span>{{node.tagName}}</span>
-        <Attribute keyName="id" :value="node.id"/>
-        <Attribute keyName="class" :value="node.className"/>
-        <span v-if="!hasChild ">/</span>
-        <span>&gt;</span>
-        <span v-if="!open && hasChild">
-          <span>...</span>
-          <span>&lt;</span>
-          <span>/</span>
-          <span>{{node.tagName}}</span>
-          <span>&gt;</span>
+    <p class="node-tag">
+        <span class="node-tag-expander" v-on:click="toggle" v-if="!open && hasChild">▶︎</span>
+        <span class="node-tag-expander" v-on:click="toggle" v-if="open && hasChild">▼</span>
+        <span v-on:click="select">
+        <span>&lt;{{node.tagName}}</span>
+          <Attribute keyName="id" :value="node.id" />
+          <Attribute keyName="class" :value="node.className" />
+          <span v-if="!hasChild ">/&gt;</span>
+          <span v-else>&gt;</span>
+          <span v-if="!open && hasChild">
+            <span>...</span>
+            <span>&lt;/{{node.tagName}}&gt;</span>
+          </span>
         </span>
     </p>
     <div class="container-node-indent" v-if="hasChild && open">
-      <div v-for="child in node.children">
-        <Node :node="child" :layer="childLayer" :model="model"/>
-      </div>
+        <div v-for="child in node.children">
+            <Node :node="child" :layer="childLayer"/>
+        </div>
     </div>
-    <p v-if="hasChild && open" class="node-tag" v-on:click="toggle">
-        <span>&lt;</span>
-        <span>/</span>
-        <span>{{node.tagName}}</span>
-        <span>&gt;</span>
+    <p v-if="hasChild && open" class="node-tag">
+        <span>&lt;/{{node.tagName}}&gt;</span>
     </p>
 </div>
 </template>
 
 <script>
 import Attribute from "./attribute.vue";
+import RootModel from "../../model/rootModel";
 export default {
     name: "Node",
-    props: ["model","node","layer"],
-    components:{
-      Attribute:Attribute
+    props: [ "node", "layer"],
+    components: {
+        Attribute: Attribute
     },
     data: function() {
         return {
-          open: this.layer<=2
+            open: this.layer <= 2
         }
     },
     computed: {
         hasChild: function() {
             return !!this.node && !!this.node.children && this.node.children.length > 0;
         },
-        childLayer:function(){
-          return this.layer + 1;
+        childLayer: function() {
+            return this.layer + 1;
         }
     },
-    methods:{
-      toggle:function(){
-        this.open = !this.open;
-        this.model.nodeModel.selectNode(this.node.key);
-      }
+    methods: {
+        toggle: function() {
+            this.open = !this.open;
+        },
+        select: function() {
+            RootModel.nodeModel.selectNode(this.node.key);
+        }
     }
 }
 </script>

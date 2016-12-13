@@ -1,6 +1,6 @@
 import MessageObserver from "../MessageObserver";
 import NodeModel from "./NodeModel";
-export default class RootModel {
+class RootModel {
     constructor() {
         this.currentNodeIndex = -1;
         this.contextLoaded = false;
@@ -9,8 +9,8 @@ export default class RootModel {
         this.nodes = [];
         this.scriptElements = [];
         this.nodeModel = new NodeModel();
-        MessageObserver.on("finding-context", (m) => {
-            this.contextLoaded = m.existing;
+        MessageObserver.on("initialize", (m) => {
+            this.contextLoaded = false;
             this.currentNodeIndex = -1;
             this.currentNodes = [];
             this.treeLabels = [];
@@ -18,8 +18,12 @@ export default class RootModel {
             this.nodeModels = [];
             this.scriptElements = [];
             this.nodeModel = new NodeModel();
+            MessageObserver.post({
+              type:"sync-devtool"
+            });
         });
         MessageObserver.on("new-tree", (m) => {
+            this.contextLoaded = true;
             this.nodes.push(m.result.rootNode);
             this.scriptElements.push(m.result.scriptElement);
             if (this.nodes.length === 1) {
@@ -72,3 +76,5 @@ export default class RootModel {
         throw new Error("Specified node tree was not found");
     }
 }
+
+export default new RootModel();

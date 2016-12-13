@@ -15,7 +15,7 @@ div.hierarchy-container p
 
 <template>
   <div class="hierarchy-container">
-    <Node :node="rootNode" layer="0" :model="model"/>
+    <Node :node="rootNode" layer="0"/>
   </div>
 </template>
 

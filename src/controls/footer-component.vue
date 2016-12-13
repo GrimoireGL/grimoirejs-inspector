@@ -20,7 +20,7 @@ p
 <div class="footer-container">
     <span class="icon-embed2"></span>
     <span v-for="(item,index) in model.treeLabels">
-      <TabItem :model="model" :index="index" :name="item"/>
+      <TabItem :index="index" :name="item"/>
     </span>
 </div>
 </template>

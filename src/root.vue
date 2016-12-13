@@ -8,9 +8,11 @@
   max-height:100%
   overflow:auto
 .container-side
-  width:240px
-  border-left: 1px solid gray;
+  width:245px
+  border-left: 1px solid gray
   height:100%
+  max-height:100%
+  overflow:auto
 .root-container
   height:100%
 .root-main

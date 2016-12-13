@@ -8,6 +8,8 @@ class NodeModel{
 
   onNodeInfoMessage(m){
     this.nodeName = m.nodeName;
+    this.className = m.className;
+    this.id = m.id;
     this.components = m.components;
   }
 

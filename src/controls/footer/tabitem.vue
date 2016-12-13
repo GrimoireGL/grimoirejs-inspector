@@ -24,16 +24,17 @@ span.footer-tabitem
 </template>
 
 <script>
+import RootModel from "../../model/rootModel";
 export default {
-    props: ["model", "name", "index"],
+    props: ["name", "index"],
     computed: {
         isActive: function() {
-            return this.model.currentNodeIndex === this.index;
+            return RootModel.currentNodeIndex === this.index;
         }
     },
     methods:{
       toggle:function(){
-        this.model.setCurrentNode(this.index);
+        RootModel.setCurrentNode(this.index);
       }
     }
 };
