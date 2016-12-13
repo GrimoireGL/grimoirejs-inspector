@@ -35,7 +35,7 @@ class AttributeController {
             } else if (at.isVector) {
                 for (let j = 0; j < at.length; j++) {
                     c = folder.add(inputObject, at.name + vectorSwizzle[j]).listen();
-                    c.onChange(this.getChangeHandler(cname,at.name,j));
+                    //c.onChange(this.getChangeHandler(cname,at.name,j));
                 }
             } else {
                 c = folder.add(inputObject, at.name).listen();
