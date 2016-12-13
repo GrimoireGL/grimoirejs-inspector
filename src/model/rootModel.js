@@ -38,6 +38,9 @@ class RootModel {
             this.nodes[index] = m.root;
             this.updateCurrentNode(index);
         });
+        MessageObserver.post({
+          type:"sync-devtool"
+        });
     }
 
     updateTreeLabels() {

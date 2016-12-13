@@ -13,25 +13,23 @@ span.node-tag-expander
   font-size:10px
 </style>
 <template>
-<div>
+<div class="container-node-indent" v-on:click="select">
     <p class="node-tag">
         <span class="node-tag-expander" v-on:click="toggle" v-if="!open && hasChild">▶︎</span>
         <span class="node-tag-expander" v-on:click="toggle" v-if="open && hasChild">▼</span>
-        <span v-on:click="select">
         <span>&lt;{{node.tagName}}</span>
-          <Attribute keyName="id" :value="node.id" />
-          <Attribute keyName="class" :value="node.className" />
-          <span v-if="!hasChild ">/&gt;</span>
-          <span v-else>&gt;</span>
-          <span v-if="!open && hasChild">
+        <Attribute keyName="id" :value="node.id" />
+        <Attribute keyName="class" :value="node.className" />
+        <span v-if="!hasChild ">/&gt;</span>
+        <span v-else>&gt;</span>
+        <span v-if="!open && hasChild">
             <span>...</span>
-            <span>&lt;/{{node.tagName}}&gt;</span>
-          </span>
+        <span>&lt;/{{node.tagName}}&gt;</span>
         </span>
     </p>
-    <div class="container-node-indent" v-if="hasChild && open">
+    <div v-if="hasChild && open">
         <div v-for="child in node.children">
-            <Node :node="child" :layer="childLayer"/>
+            <Node :node="child" :layer="childLayer" />
         </div>
     </div>
     <p v-if="hasChild && open" class="node-tag">
@@ -45,7 +43,7 @@ import Attribute from "./attribute.vue";
 import RootModel from "../../model/rootModel";
 export default {
     name: "Node",
-    props: [ "node", "layer"],
+    props: ["node", "layer"],
     components: {
         Attribute: Attribute
     },
@@ -66,7 +64,8 @@ export default {
         toggle: function() {
             this.open = !this.open;
         },
-        select: function() {
+        select: function(e) {
+            e.stopPropagation();
             RootModel.nodeModel.selectNode(this.node.key);
         }
     }
