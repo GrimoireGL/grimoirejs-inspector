@@ -11,6 +11,10 @@ span.node-tag-expander
   cursor:pointer
   color:dimgray
   font-size:10px
+span.node-expander-points
+  cursor:pointer
+  color:dimgray
+  font-size:10px
 </style>
 <template>
 <div class="container-node-indent" v-on:click="select">
@@ -23,7 +27,7 @@ span.node-tag-expander
         <span v-if="!hasChild ">/&gt;</span>
         <span v-else>&gt;</span>
         <span v-if="!open && hasChild">
-            <span>...</span>
+            <span class="node-expander-points" v-on:click="toggle">...</span>
         <span>&lt;/{{node.tagName}}&gt;</span>
         </span>
     </p>
@@ -61,7 +65,8 @@ export default {
         }
     },
     methods: {
-        toggle: function() {
+        toggle: function(e) {
+            e.stopPropagation();
             this.open = !this.open;
         },
         select: function(e) {

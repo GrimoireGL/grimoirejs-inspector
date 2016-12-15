@@ -33,7 +33,7 @@ class AttributeWatcher {
             attr: attr,
             handler: func
         });
-        attr.addObserver(func);
+        attr.watch(func);
     }
 
     removeHandlers() {
