@@ -1,11 +1,26 @@
 function injectScript(file, node) {
     var s, th;
-    th = document.getElementsByTagName(node)[0];
-    s = document.createElement('script');
-    s.setAttribute('type', 'text/javascript');
-    s.setAttribute('src', file);
-    s.setAttribute('x-injectedBy',"GrimoireJS Inspector");
-    return th.appendChild(s);
+    th = document.getElementsByTagName(node);
+    for(var i = 0; i < th.length; i++){
+      s = document.createElement('script');
+      s.setAttribute('type', 'text/javascript');
+      s.setAttribute('src', file);
+      s.setAttribute('x-injectedBy',"GrimoireJS Inspector");
+    return th.item(0).appendChild(s);
+    }
+};
+
+function injectToIframe(file) {
+    var s, th;
+    th = document.getElementsByTagName("iframe");
+    for(var i = 0; i < th.length; i++){
+      var ifDoc = th.item(i).contentWindow.document;
+      s = ifDoc.createElement('script');
+      s.setAttribute('type', 'text/javascript');
+      s.setAttribute('src', file);
+      s.setAttribute('x-injectedBy',"GrimoireJS Inspector");
+      return ifDoc.body.appendChild(s);
+    }
 };
 
 window.addEventListener('message', function(event) {
@@ -23,7 +38,10 @@ window.addEventListener('message', function(event) {
 });
 
 window.addEventListener("DOMContentLoaded", () => {
+  setTimeout(function(){ // TODO to load with injected iframe(such as grimoire.gl-examples). Should use mutation observer
     injectScript(chrome.extension.getURL('../lib/embed.js'), "body");
+    injectToIframe(chrome.extension.getURL('../lib/embed.js'));
+  },5000);
 });
 
 chrome.runtime.onMessage.addListener((message)=>{
