@@ -1810,6 +1810,10 @@ ms@0.7.1:
   version "0.7.1"
   resolved "https://registry.yarnpkg.com/ms/-/ms-0.7.1.tgz#9cd13c03adbff25b65effde7ce864ee952017098"
 
+mutation-summary@^0.1.1:
+  version "0.1.1"
+  resolved "https://registry.yarnpkg.com/mutation-summary/-/mutation-summary-0.1.1.tgz#0cbdb0c991b1fb259657cc82b9e5710a53a416a9"
+
 mute-stream@~0.0.4:
   version "0.0.6"
   resolved "https://registry.yarnpkg.com/mute-stream/-/mute-stream-0.0.6.tgz#48962b19e169fd1dfc240b3f1e7317627bbc47db"
@@ -2939,7 +2943,7 @@ utile@0.3.x:
     ncp "1.0.x"
     rimraf "2.x.x"
 
-uuid@^3.0.0:
+uuid@^3.0.0, uuid@^3.0.1:
   version "3.0.1"
   resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.0.1.tgz#6544bba2dfda8c1cf17e629a3a305e2bb1fee6c1"
 

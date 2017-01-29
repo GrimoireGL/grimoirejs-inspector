@@ -1,40 +1,42 @@
-class MessageObserver{
-  constructor(){
-    // connect to background page
-    this.bpc = chrome.runtime.connect({
-        name: "panel"
-    });
-    this.bpc.onMessage.addListener(this.onRecieve.bind(this));
-    this.handlers = {};
-  }
-
-  post(message){
-    if(message.type === void 0){
-      throw new Error("message type should be specified");
+class MessageObserver {
+    constructor() {
+        // connect to background page
+        this.bpc = chrome.runtime.connect({
+            name: "panel"
+        });
+        this.bpc.onMessage.addListener(this.onRecieve.bind(this));
+        this.handlers = {};
     }
-    const nm = Object.assign({
-      $tabId:chrome.devtools.inspectedWindow.tabId,
-      $source:"grimoire-inspector-dev-tool"
-    },message);
-    this.bpc.postMessage(nm);
-  }
 
-  onRecieve(message){
-    if(this.handlers[message.type]){
-      this.handlers[message.type](message);
+    post(message) {
+        if (message.type === void 0) {
+            throw new Error("message type should be specified");
+        }
+        const nm = Object.assign({
+            $tabId: chrome.devtools.inspectedWindow.tabId,
+            $source: "grimoire-inspector-dev-tool"
+        }, message);
+        this.bpc.postMessage(nm);
     }
-  }
 
-  on(key,handler){
-    this.handlers[key] = handler;
-  }
+    onRecieve(message) {
+        if (this.handlers[message.type]) {
+            this.handlers[message.type](message);
+        }
+    }
 
-  init(){
-    this.bpc.postMessage({
-        name: 'init',
-        tabId: chrome.devtools.inspectedWindow.tabId
-    });
-  }
+    on(key, handler) {
+        this.handlers[key] = handler;
+    }
+
+    init() {
+        if (chrome.devtools.inspectedWindow) {
+            this.bpc.postMessage({
+                name: 'init',
+                tabId: chrome.devtools.inspectedWindow.tabId
+            });
+        }
+    }
 }
 
 const mo = new MessageObserver();

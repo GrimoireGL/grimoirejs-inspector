@@ -1,51 +1,62 @@
-function injectScript(file, node) {
-    var s, th;
-    th = document.getElementsByTagName(node);
-    for(var i = 0; i < th.length; i++){
-      s = document.createElement('script');
-      s.setAttribute('type', 'text/javascript');
-      s.setAttribute('src', file);
-      s.setAttribute('x-injectedBy',"GrimoireJS Inspector");
-    return th.item(0).appendChild(s);
+import MessageUtil from "./MessageUtil";
+const injectedFile = chrome.extension.getURL('../../lib/embed.js');
+const iframeWindows = [];
+
+function injectScriptToBody() {
+    const body = document.getElementsByTagName("body").item(0);
+    injectScript(body, document);
+}
+
+function injectScript(target, doc) {
+    const　 s = doc.createElement('script');
+    s.setAttribute('type', 'text/javascript');
+    s.setAttribute('src', injectedFile);
+    s.setAttribute('x-injectedBy', "GrimoireJS Inspector");
+    return target.appendChild(s);
+};
+
+function injectToIframe(id) {
+    const frames = document.getElementsByClassName(id);
+    const frameWindow = frames[0].contentWindow;
+    const frameDocument = frameWindow.document;
+    observeMessage(frameWindow);
+    if (frameDocument.readyState === "complete" || frameDocument.readyState === "loaded") {
+        const body = frameDocument.getElementsByTagName("body").item(0);
+        injectScript(body, frameDocument);
+        iframeWindows.push(frameWindow);
+    } else {
+        frameWindow.addEventListener("DOMContentLoaded", () => {
+            const body = frameDocument.getElementsByTagName("body").item(0);
+            injectScript(body, frameDocument);
+            iframeWindows.push(frameWindow);
+        });
     }
 };
 
-function injectToIframe(file) {
-    var s, th;
-    th = document.getElementsByTagName("iframe");
-    for(var i = 0; i < th.length; i++){
-      var ifDoc = th.item(i).contentWindow.document;
-      s = ifDoc.createElement('script');
-      s.setAttribute('type', 'text/javascript');
-      s.setAttribute('src', file);
-      s.setAttribute('x-injectedBy',"GrimoireJS Inspector");
-      return ifDoc.body.appendChild(s);
-    }
-};
+function observeMessage(wnd) {
+    // EmbedWindow -> ContentScript -> BackgroundScript -> Inspector
+    wnd.addEventListener('message', function(event) {
+        // Only accept messages from the same frame
+        var message = event.data;
+        if (!MessageUtil.verifyMessage(message)) return;
+        if (message.$toContent) {
+            injectToIframe(message.id);
+        } else {
+            MessageUtil.toBackground(message);
+        }
+    });
+}
 
-window.addEventListener('message', function(event) {
-  // Only accept messages from the same frame
-  if (event.source !== window) {
-    return;
-  }
-  var message = event.data;
-
-  if (typeof message !== 'object' || message === null ||
-      !message.source === 'grimoire-inspector') {
-    return;
-  }
-  chrome.runtime.sendMessage(message);
-});
+observeMessage(window);
 
 window.addEventListener("DOMContentLoaded", () => {
-  setTimeout(function(){ // TODO to load with injected iframe(such as grimoire.gl-examples). Should use mutation observer
-    injectScript(chrome.extension.getURL('../../lib/embed.js'), "body");
-    //injectToIframe(chrome.extension.getURL('../lib/embed.js'));
-  },5000);
+    injectScriptToBody();
 });
 
-chrome.runtime.onMessage.addListener((message)=>{
-  if(message.$source === "grimoire-inspector-dev-tool"){
-    window.postMessage(message,"*");
-  }
+// Inspector -> BackgroundScript -> ContentScript -> EmbedWindow
+chrome.runtime.onMessage.addListener((message) => {
+    MessageUtil.toWindow(window, message);
+    // iframeWindows.forEach(f => {
+    //     MessageUtil.toWindow(message,f);
+    // })
 });

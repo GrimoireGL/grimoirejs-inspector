@@ -1,6 +1,5 @@
 var connections = {};
 chrome.runtime.onConnect.addListener(function(port) {
-
     // devTools側からのリスナー
     var devtoolListener = function(message, sender, sendResponse) {
         if (message.name == "init") {
@@ -8,6 +7,7 @@ chrome.runtime.onConnect.addListener(function(port) {
             return;
         } else {
             if (message.$source === "grimoire-inspector-dev-tool") {
+
                 chrome.tabs.sendMessage(message.$tabId, message);
             }
         }
@@ -16,7 +16,7 @@ chrome.runtime.onConnect.addListener(function(port) {
     // Listen to messages sent from the DevTools page
     port.onMessage.addListener(devtoolListener);
     port.onDisconnect.addListener(function(port) {
-        port.onMessage.removeListener(extensionListener);
+        port.onMessage.removeListener(devToolsListener);
 
         var tabs = Object.keys(connections);
         for (var i = 0, len = tabs.length; i < len; i++) {
@@ -32,13 +32,12 @@ chrome.runtime.onConnect.addListener(function(port) {
 // current tab
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Messages from content scripts should have sender.tab set
-    if (sender.tab) {
+    if (sender.tab && request.$source === "grimoire-inspector") {
         var tabId = sender.tab.id;
         if (tabId in connections) {
             connections[tabId].postMessage(request);
         }
-    } else {
-        console.log("sender.tab not defined.");
+        console.log(request,sender);
     }
     return true;
 });

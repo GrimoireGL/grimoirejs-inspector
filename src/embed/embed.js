@@ -1,8 +1,10 @@
 import MessageManager from "./MessageManager";
 import ObjectConverter from "./ObjectConverter";
 import AttributeWatcher from "./AttributeWatcher";
+import MutationSummary from "mutation-summary";
+import UUID from "uuid/v4";
 MessageManager.on("sync-devtool", function() {
-    if(!!window.GrimoireJS) {
+    if (!!window.GrimoireJS) {
         function observeRoot(element) {
             const observer = new MutationObserver((mutations) => {
                 mutations.forEach((mutation) => {
@@ -33,7 +35,7 @@ MessageManager.on("sync-devtool", function() {
             if (!node) {
                 return;
             }
-            const components = node._components.map(m=>ObjectConverter.fromComponent(m));
+            const components = node._components.map(m => ObjectConverter.fromComponent(m));
             MessageManager.post({
                 type: "node-info",
                 nodeName: node.name.name,
@@ -58,6 +60,26 @@ MessageManager.on("sync-devtool", function() {
         }
     }
 });
-MessageManager.post({
-    type: "initialize"
+if (!!window.GrimoireJS) {
+    MessageManager.post({
+        type: "initialize"
+    });
+}
+const iframeObserver = new MutationSummary({
+    callback: (e) => {
+        for (let i = 0; i < e.length; i++) {
+            for (let j = 0; j < e[i].added.length; j++) {
+                const elem = e[i].added[j];
+                const id = UUID();
+                elem.className += " " + id;
+                MessageManager.post({
+                    type: "add-iframe",
+                    id: id
+                }, true)
+            }
+        }
+    },
+    queries: [{
+        element: "iframe"
+    }]
 });

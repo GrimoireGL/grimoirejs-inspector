@@ -15,9 +15,10 @@ class MessageManager {
       }
     }
 
-    post(message) {
+    post(message,toContent) {
         const packet = Object.assign({
-            $source: "grimoire-inspector"
+            $source: "grimoire-inspector",
+            $toContent: toContent? true:undefined
         }, message);
         if(packet.type === void 0){
           throw new Error("Type must be specified");
