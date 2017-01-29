@@ -1,7 +1,7 @@
 module.exports = [{
-    entry: "./src/index.js",
+    entry: "./src/devtool/devtool.js",
     output: {
-        filename: "./lib/bundle.js"
+        filename: "./lib/devtool.js"
     },
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
@@ -25,9 +25,9 @@ module.exports = [{
         ]
     }
 }, {
-    entry: "./inject/inject.js",
+    entry: "./src/contentScript/contentScript.js",
     output: {
-        filename: "./lib/inject.js"
+        filename: "./lib/contentScript.js"
     },
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
@@ -46,7 +46,7 @@ module.exports = [{
     }
 },
 {
-    entry: "./embed/embed.js",
+    entry: "./src/embed/embed.js",
     output: {
         filename: "./lib/embed.js"
     },
@@ -67,7 +67,7 @@ module.exports = [{
     }
 },
 {
-    entry: "./background/background.js",
+    entry: "./src/background/background.js",
     output: {
         filename: "./lib/background.js"
     },

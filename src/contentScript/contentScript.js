@@ -40,7 +40,7 @@ window.addEventListener('message', function(event) {
 window.addEventListener("DOMContentLoaded", () => {
   setTimeout(function(){ // TODO to load with injected iframe(such as grimoire.gl-examples). Should use mutation observer
     injectScript(chrome.extension.getURL('../lib/embed.js'), "body");
-    injectToIframe(chrome.extension.getURL('../lib/embed.js'));
+    //injectToIframe(chrome.extension.getURL('../lib/embed.js'));
   },5000);
 });
 

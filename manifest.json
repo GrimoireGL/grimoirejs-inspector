@@ -2,8 +2,8 @@
   "name": "Grimoire.js Devtool",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "The inspector of Grimoire.js help us develop WebGL stuff as front-end web.",
-  "devtools_page": "view/init.html",
+  "description": "The inspector of Grimoire.js help us to develop WebGL stuff.",
+  "devtools_page": "src/devtool/init.html",
   "permissions": [
     "tabs",
     "http://*/*",
@@ -15,7 +15,7 @@
       "https://*/*"
     ],
     "run_at" :"document_start",
-    "js":["lib/inject.js"],
+    "js":["lib/contentScript.js"],
     "all_frames": true
   }],
   "web_accessible_resources":[
@@ -25,6 +25,6 @@
     "scripts":["lib/background.js"]
   },
   "icons":{
-    "1024":"./logos/logo.png"
+    "1024":"./resources/logos/logo.png"
   }
 }
