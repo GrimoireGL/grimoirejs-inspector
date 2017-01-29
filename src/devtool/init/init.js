@@ -1,3 +1,3 @@
-chrome.devtools.panels.create("Grimoire","view/logo.png", "view/devtool.html", function(panel) {
+chrome.devtools.panels.create("Grimoire","resources/logos/logo.png", "src/devtool/init/devtool.html", function(panel) {
 
 });

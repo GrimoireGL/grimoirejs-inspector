@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "manifest_version": 2,
   "description": "The inspector of Grimoire.js help us to develop WebGL stuff.",
-  "devtools_page": "src/devtool/init.html",
+  "devtools_page": "src/devtool/init/init.html",
   "permissions": [
     "tabs",
     "http://*/*",
