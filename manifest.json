@@ -10,7 +10,10 @@
     "https://*/*"
   ],
   "content_scripts":[{
-    "matches":["<all_urls>"],
+    "matches":[
+      "http://*/*",
+      "https://*/*"
+    ],
     "run_at" :"document_start",
     "js":["lib/inject.js"],
     "all_frames": true
