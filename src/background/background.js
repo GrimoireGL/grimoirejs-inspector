@@ -1,15 +1,14 @@
-var connections = {};
+import MessageManager from "./MessageManager";
+const mm = new MessageManager();
 chrome.runtime.onConnect.addListener(function(port) {
     // devTools側からのリスナー
     var devtoolListener = function(message, sender, sendResponse) {
-        if (message.name == "init") {
-            connections[message.tabId] = port;
-            return;
-        } else {
-            if (message.$source === "grimoire-inspector-dev-tool") {
-
-                chrome.tabs.sendMessage(message.$tabId, message);
-            }
+        if (mm.verifyDevtoolMessage(message)) {
+          if(message.type === "connection-establish"){
+            mm.establish(port);
+          }else{
+            mm.toContent(message);
+          }
         }
     }
 
@@ -17,14 +16,7 @@ chrome.runtime.onConnect.addListener(function(port) {
     port.onMessage.addListener(devtoolListener);
     port.onDisconnect.addListener(function(port) {
         port.onMessage.removeListener(devToolsListener);
-
-        var tabs = Object.keys(connections);
-        for (var i = 0, len = tabs.length; i < len; i++) {
-            if (connections[tabs[i]] == port) {
-                delete connections[tabs[i]]
-                break;
-            }
-        }
+        mm.disconnect();
     });
 });
 
@@ -32,12 +24,6 @@ chrome.runtime.onConnect.addListener(function(port) {
 // current tab
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
     // Messages from content scripts should have sender.tab set
-    if (sender.tab && request.$source === "grimoire-inspector") {
-        var tabId = sender.tab.id;
-        if (tabId in connections) {
-            connections[tabId].postMessage(request);
-        }
-        console.log(request,sender);
-    }
+    mm.toDevTool(request,sender);
     return true;
 });

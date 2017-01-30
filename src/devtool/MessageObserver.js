@@ -22,6 +22,11 @@ class MessageObserver {
     onRecieve(message) {
         if (this.handlers[message.type]) {
             this.handlers[message.type](message);
+        }else{
+          console.warn(`No handler found for message type "${message.type}"`);
+        }
+        if(message.type==="initialize"){
+          debugger;
         }
     }
 
@@ -31,10 +36,11 @@ class MessageObserver {
 
     init() {
         if (chrome.devtools.inspectedWindow) {
-            this.bpc.postMessage({
-                name: 'init',
-                tabId: chrome.devtools.inspectedWindow.tabId
-            });
+            this.post({
+              type:"connection-establish"
+            })
+        }else{
+          console.log("invalid")
         }
     }
 }
