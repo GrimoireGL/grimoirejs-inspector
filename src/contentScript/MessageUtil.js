@@ -8,10 +8,15 @@ export default class MessageUtil{
   }
 
   static toWindow(wnd,message){
-    wnd.postMessage(message,"*");
-    if(!debugMode)return;
+    try{
+      wnd.postMessage(message,"*");
+    }catch(e){
+      return false;
+    }
+    if(!debugMode)return true;
     console.log(`ContentScript -> Window\n${message.type}`);
     console.log(message);
+    return true;
   }
 
 

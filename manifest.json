@@ -15,8 +15,7 @@
       "https://*/*"
     ],
     "run_at" :"document_start",
-    "js":["lib/contentScript.js"],
-    "all_frames": true
+    "js":["lib/contentScript.js"]
   }],
   "web_accessible_resources":[
     "lib/embed.js"
