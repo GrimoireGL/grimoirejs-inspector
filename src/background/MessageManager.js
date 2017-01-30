@@ -15,9 +15,9 @@ export default class MessageManager{
     }
   }
 
-  toDevTool(request,sender){
-    if (sender.tab && request.$source === "grimoire-inspector") {
-        const tabId = sender.tab.id;
+  toDevTool(request,sender,fromBackground){
+    const tabId = sender?sender.tab.id:null;
+    if ((request.$source === "grimoire-inspector" && tabId === this.tabId) || fromBackground) {
         if(this.devToolPort){
           this.devToolPort.postMessage(request);
           console.log(`Background -> DevTool`);
@@ -29,7 +29,8 @@ export default class MessageManager{
   toContent(message){
     if (this.verifyDevtoolMessage(message)) {
         chrome.tabs.sendMessage(message.$tabId, message);
-        console.log(`Background -> ContentScript`);
+        this.tabId = message.$tabId;
+        console.log(`Background -> ContentScript:${message.$tabId}`);
         console.log(message);
     }
   }

@@ -29,22 +29,6 @@ MessageManager.on("sync-devtool", function() {
             });
         }
 
-        MessageManager.on("fetch-node", function(m) {
-            AttributeWatcher.removeHandlers();
-            const node = window.GrimoireJS.nodeDictionary[m.key];
-            if (!node) {
-                return;
-            }
-            const components = node._components.map(m => ObjectConverter.fromComponent(m));
-            MessageManager.post({
-                type: "node-info",
-                nodeName: node.name.name,
-                className: node.element.className,
-                id: node.element.id,
-                components: components
-            });
-            AttributeWatcher.watch(node);
-        });
 
         for (let key in window.GrimoireJS.rootNodes) {
             const root = window.GrimoireJS.rootNodes[key];
@@ -60,6 +44,25 @@ MessageManager.on("sync-devtool", function() {
         }
     }
 });
+
+MessageManager.on("fetch-node", function(m) {
+    AttributeWatcher.removeHandlers();
+    if(!window.GrimoireJS)return;
+    const node = window.GrimoireJS.nodeDictionary[m.key];
+    if (!node) {
+        return;
+    }
+    const components = node._components.map(m => ObjectConverter.fromComponent(m));
+    MessageManager.post({
+        type: "node-info",
+        nodeName: node.name.name,
+        className: node.element.className,
+        id: node.element.id,
+        components: components
+    });
+    AttributeWatcher.watch(node);
+});
+
 if (!!window.GrimoireJS) {
     MessageManager.post({
         type: "initialize"

@@ -10,8 +10,6 @@ class MessageManager {
       }
       if(this.handlers[message.data.type]){
         this.handlers[message.data.type](message.data);
-      }else{
-        throw new Error("No handler found for " + message.data.type);
       }
     }
 

@@ -25,9 +25,6 @@ class MessageObserver {
         }else{
           console.warn(`No handler found for message type "${message.type}"`);
         }
-        if(message.type==="initialize"){
-          debugger;
-        }
     }
 
     on(key, handler) {

@@ -10,19 +10,7 @@ class RootModel {
         this.scriptElements = [];
         this.nodeModel = new NodeModel();
         MessageObserver.on("initialize", (m) => {
-            this.contextLoaded = false;
-            this.currentNodeIndex = -1;
-            this.currentNodes = [];
-            this.treeLabels = [];
-            this.nodes = [];
-            this.nodeModels = [];
-            this.scriptElements = [];
-            this.nodeModel = new NodeModel();
-            if (this.isNotFirstLoad) {
-                MessageObserver.post({
-                    type: "sync-devtool"
-                });
-            }
+          this.reset();
         });
         MessageObserver.on("new-tree", (m) => {
             this.contextLoaded = true;
@@ -80,6 +68,22 @@ class RootModel {
             }
         }
         throw new Error("Specified node tree was not found");
+    }
+
+    reset(){
+      this.contextLoaded = false;
+      this.currentNodeIndex = -1;
+      this.currentNodes = [];
+      this.treeLabels = [];
+      this.nodes = [];
+      this.nodeModels = [];
+      this.scriptElements = [];
+      this.nodeModel = new NodeModel();
+      if (this.isNotFirstLoad) {
+          MessageObserver.post({
+              type: "sync-devtool"
+          });
+      }
     }
 }
 

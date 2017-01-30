@@ -1,4 +1,5 @@
 import MessageUtil from "./MessageUtil";
+console.log("content script");
 const injectedFile = chrome.extension.getURL('../../lib/embed.js');
 const iframeWindows = [];
 

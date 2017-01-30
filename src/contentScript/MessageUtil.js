@@ -2,12 +2,14 @@ const debugMode = false;
 export default class MessageUtil{
   static toBackground(message){
     chrome.runtime.sendMessage(message);
-    console.log(`ContentScript -> BackgroundPage\n`,JSON.stringify(message,null,2));
+    console.log(`ContentScript -> BackgroundPage\n${message.type}`);
+    console.log(message);
   }
 
   static toWindow(wnd,message){
     wnd.postMessage(message,"*");
-    console.log(`ContentScript -> Window\n`,JSON.stringify(message,null,2),wnd);
+    console.log(`ContentScript -> Window\n${message.type}`);
+    console.log(message);
   }
 
 

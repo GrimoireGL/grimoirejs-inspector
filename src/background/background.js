@@ -1,5 +1,6 @@
 import MessageManager from "./MessageManager";
 const mm = new MessageManager();
+console.log("background script");
 chrome.runtime.onConnect.addListener(function(port) {
     // devTools側からのリスナー
     var devtoolListener = function(message, sender, sendResponse) {
