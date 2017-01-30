@@ -56,7 +56,7 @@ window.addEventListener("DOMContentLoaded", () => {
 // Inspector -> BackgroundScript -> ContentScript -> EmbedWindow
 chrome.runtime.onMessage.addListener((message) => {
     MessageUtil.toWindow(window, message);
-    // iframeWindows.forEach(f => {
-    //     MessageUtil.toWindow(message,f);
-    // })
+    iframeWindows.forEach(f => {
+        MessageUtil.toWindow(f,message);
+    })
 });
