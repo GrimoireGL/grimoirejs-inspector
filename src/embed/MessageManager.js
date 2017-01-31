@@ -1,3 +1,4 @@
+import isPromise from "is-promise";
 class MessageManager {
     constructor() {
       this.handlers = {};
@@ -9,7 +10,7 @@ class MessageManager {
         return;
       }
       if(this.handlers[message.data.type]){
-        this.handlers[message.data.type](message.data);
+        this.handlers[message.data.type].forEach(f=>f(message.data));
       }
     }
 
@@ -24,8 +25,38 @@ class MessageManager {
         window.postMessage(packet, "*");
     }
 
+    response(type,handler){
+      this.on(type,(message)=>{
+        const result = handler(message);
+        if(isPromise(result)){
+          result.then((actualResult)=>{
+            actualResult.$callId = message.$callId;
+            actualResult.type = type;
+            this.post(actualResult);
+          });
+        }else{
+          result.$callId = message.$callId;
+          result.type = type;
+           this.post(result);
+        }
+      });
+    }
+
     on(type,handler){
-      this.handlers[type] = handler;
+      if(this.handlers[type] === void 0){
+        this.handlers[type] = [];
+      }
+      this.handlers[type].push(handler);
+    }
+
+    off(type,handler){
+      if(this.handlers[type] === void 0){
+        return
+      }
+      const index = this.handlers[type].indexOf(handler);
+      if(index !== -1){
+        this.handlers[type].splice(index,1);
+      }
     }
 }
 

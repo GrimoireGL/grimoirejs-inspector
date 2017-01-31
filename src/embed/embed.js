@@ -86,3 +86,12 @@ const iframeObserver = new MutationSummary({
         element: "iframe"
     }]
 });
+
+let i = 0;
+MessageManager.response("ping",(a)=>{
+  return new Promise((resolve,reject)=>{
+    setTimeout(()=>{
+      resolve({result:i++});
+    },100);
+  });
+});

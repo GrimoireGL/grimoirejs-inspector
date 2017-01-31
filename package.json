@@ -10,6 +10,7 @@
     "author": "",
     "license": "MIT",
     "dependencies": {
+        "is-promise": "^2.1.0",
         "mutation-summary": "^0.1.1",
         "uuid": "^3.0.1",
         "vue": "^2.1.4",
