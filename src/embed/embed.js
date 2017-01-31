@@ -32,17 +32,24 @@ MessageManager.on("sync-devtool", function() {
 
         for (let key in window.GrimoireJS.rootNodes) {
             const root = window.GrimoireJS.rootNodes[key];
+            const message = ObjectConverter.fromElement(root.companion.get("scriptElement"), true);
+            message.key = key;
             MessageManager.post({
                 type: "new-tree",
-                result: {
-                    key: key,
-                    rootNode: ObjectConverter.fromElement(root.element),
-                    scriptElement: ObjectConverter.fromElement(root.companion.get("scriptElement"), true)
-                }
+                result: message
             });
-            observeRoot(root.element);
+            //observeRoot(root.element);
         }
     }
+});
+
+MessageManager.response("fetch-tree",(m)=>{
+  if(!window.GrimoireJS)return;
+  const rootNode = window.GrimoireJS.rootNodes[m.key];
+  if(rootNode === void 0)return;
+  return {
+    root:ObjectConverter.fromElement(rootNode.element)
+  }
 });
 
 MessageManager.on("fetch-node", function(m) {
@@ -78,20 +85,11 @@ const iframeObserver = new MutationSummary({
                 MessageManager.post({
                     type: "add-iframe",
                     id: id
-                }, true)
+                }, true)// send to content script
             }
         }
     },
     queries: [{
         element: "iframe"
     }]
-});
-
-let i = 0;
-MessageManager.response("ping",(a)=>{
-  return new Promise((resolve,reject)=>{
-    setTimeout(()=>{
-      resolve({result:i++});
-    },100);
-  });
 });

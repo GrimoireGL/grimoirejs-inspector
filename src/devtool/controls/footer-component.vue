@@ -19,22 +19,20 @@ p
 <template>
 <div class="footer-container">
     <span class="icon-embed2"></span>
-    <span v-for="(item,index) in model.treeLabels">
+    <span v-for="(item,index) in labels">
       <TabItem :index="index" :name="item"/>
     </span>
 </div>
 </template>
 
 <script>
+import {mapState} from "vuex";
 import TabItem from "./footer/tabitem.vue";
 
 export default {
-    props: ["model"],
     components: {
         TabItem: TabItem
     },
-    data: function() {
-        return {}
-    }
+    computed: mapState(["labels"])
 }
 </script>

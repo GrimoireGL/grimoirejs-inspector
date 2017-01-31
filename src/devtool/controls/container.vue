@@ -15,22 +15,18 @@ div.hierarchy-container p
 
 <template>
   <div class="hierarchy-container">
-    <Node :node="rootNode" layer="0"/>
+    <Node :node="tree" layer="0"/>
   </div>
 </template>
 
 <script>
   import Node from "./container/node.vue";
-
+  import {mapState} from "vuex";
   export default {
     components:{
       Node:Node
     },
-    props:["rootNode","model"],
-    data: function() {
-        return {
-
-        }
-    }
+    props:["model"],
+    computed:mapState(["tree"])
   }
 </script>

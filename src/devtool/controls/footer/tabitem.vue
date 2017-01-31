@@ -29,7 +29,7 @@ export default {
     props: ["name", "index"],
     computed: {
         isActive: function() {
-            return RootModel.currentNodeIndex === this.index;
+          return this.$store.state.activeGomlIndex === this.index;
         }
     },
     methods:{

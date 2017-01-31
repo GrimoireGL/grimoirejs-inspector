@@ -36,7 +36,7 @@ div
     <div class="root-main">
         <div class="container">
             <div class="container-main">
-                <p class="container-context-notfound" v-if="!model.contextLoaded">Grimoire.js context was not found.</p>
+                <p class="container-context-notfound" v-if="!contextLoaded">Grimoire.js context was not found.</p>
                 <Container :rootNode="model.currentNodes" :model="model" v-else/>
             </div>
             <div class="container-side">
@@ -54,9 +54,11 @@ div
 import FooterComponent from "./controls/footer-component.vue";
 import Container from "./controls/container.vue";
 import Inspector from "./controls/inspector.vue";
-
+import storeRoot from "./model/storeRoot";
+import {mapState} from "vuex";
 export default {
     props:{},
+    store:storeRoot,
     components: {
         FooterComponent: FooterComponent,
         Container: Container,
@@ -66,6 +68,7 @@ export default {
         return {
             model:{}
         }
-    }
+    },
+    computed:mapState(["contextLoaded"])
 }
 </script>

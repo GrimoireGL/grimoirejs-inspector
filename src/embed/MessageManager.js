@@ -28,6 +28,9 @@ class MessageManager {
     response(type,handler){
       this.on(type,(message)=>{
         const result = handler(message);
+        if(result === void 0){
+          return;// Only when the request is not on this frame
+        }
         if(isPromise(result)){
           result.then((actualResult)=>{
             actualResult.$callId = message.$callId;
