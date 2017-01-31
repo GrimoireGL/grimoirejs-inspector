@@ -1,4 +1,4 @@
-import MessageObserver from "../MessageObserver";
+import MessageManager from "../MessageManager";
 import NodeModel from "./NodeModel";
 class RootModel {
     constructor() {
@@ -9,10 +9,10 @@ class RootModel {
         this.nodes = [];
         this.scriptElements = [];
         this.nodeModel = new NodeModel();
-        MessageObserver.on("initialize", (m) => {
+        MessageManager.on("initialize", (m) => {
           this.reset();
         });
-        MessageObserver.on("new-tree", (m) => {
+        MessageManager.on("new-tree", (m) => {
             this.contextLoaded = true;
             this.nodes.push(m.result.rootNode);
             this.scriptElements.push(m.result.scriptElement);
@@ -23,12 +23,12 @@ class RootModel {
             }
             this.updateTreeLabels();
         });
-        MessageObserver.on("node-added", (m) => {
+        MessageManager.on("node-added", (m) => {
             const index = this.findNodesIndex(m.root);
             this.nodes[index] = m.root;
             this.updateCurrentNode(index);
         });
-        MessageObserver.post({
+        MessageManager.post({
             type: "sync-devtool"
         });
         this.isNotFirstLoad = true;
@@ -80,7 +80,7 @@ class RootModel {
       this.scriptElements = [];
       this.nodeModel = new NodeModel();
       if (this.isNotFirstLoad) {
-          MessageObserver.post({
+          MessageManager.post({
               type: "sync-devtool"
           });
       }

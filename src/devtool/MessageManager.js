@@ -1,4 +1,4 @@
-class MessageObserver {
+class MessageManager {
     constructor() {
         // connect to background page
         this.bpc = chrome.runtime.connect({
@@ -42,6 +42,6 @@ class MessageObserver {
     }
 }
 
-const mo = new MessageObserver();
-mo.init();
-export default mo;
+const mm = new MessagerManager();
+mm.init();
+export default mm;

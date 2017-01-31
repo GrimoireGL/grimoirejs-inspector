@@ -1,9 +1,9 @@
-import MessageObserver from "../MessageObserver";
+import MessageManager from "../MessageManager";
 class NodeModel{
   constructor(){
       this.nodeName = null;
       this.components = [];
-      MessageObserver.on("node-info",this.onNodeInfoMessage.bind(this));
+      MessageManager.on("node-info",this.onNodeInfoMessage.bind(this));
   }
 
   onNodeInfoMessage(m){
@@ -14,7 +14,7 @@ class NodeModel{
   }
 
   selectNode(key){
-    MessageObserver.post({
+    MessageManager.post({
       type:"fetch-node",
       key:key
     });

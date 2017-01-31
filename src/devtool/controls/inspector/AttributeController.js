@@ -1,9 +1,9 @@
-import MessageObserver from "../../MessageObserver";
+import MessageManager from "../../MessageManager";
 import InspectorUI from "../../inspectorUI";
 const vectorSwizzle = [".x", ".y", ".z", ".w"];
 class AttributeController {
     constructor() {
-        MessageObserver.on("attribute-update", (m) => {
+        MessageManager.on("attribute-update", (m) => {
             if (this.inputObjects) {
                 for (let ci = 0; ci < m.components.length; ci++) {
                     const cname = m.components[ci].name;
@@ -15,7 +15,7 @@ class AttributeController {
 
     getChangeHandler(cname, attrName, isVector) {
         return function(v) {
-            MessageObserver.post({
+            MessageManager.post({
                 type: "attribute-manual-change",
                 attrName: attrName,
                 cName: cname,

@@ -1,7 +1,11 @@
 import "./inspectorUI";
 import Vue from "vue";
+import Store from "./model/storeRoot";
 import root from "./root.vue";
-import MessageObserver from "./MessageObserver";
+import MessageManager from "./MessageManager";
 import RootModel from "./model/rootModel";
+console.log(Store);
+Store.commit("addGoml","test1");
+console.log(Store);
 const rc = new Vue(root).$mount("#app");
 rc.model = RootModel;

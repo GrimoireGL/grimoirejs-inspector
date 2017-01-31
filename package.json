@@ -13,7 +13,8 @@
         "mutation-summary": "^0.1.1",
         "uuid": "^3.0.1",
         "vue": "^2.1.4",
-        "vue-loader": "^10.0.2"
+        "vue-loader": "^10.0.2",
+        "vuex": "^2.1.1"
     },
     "devDependencies": {
         "@types/vue": "^1.0.31",
