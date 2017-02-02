@@ -7,9 +7,14 @@
 
 <template>
 <div>
-    <NodeHead :tagName="nodeModel.nodeName" :id="nodeModel.id" :className="nodeModel.className" />
-    <div ref="inspector">
-    </div>
+  <div v-if="nodeSelected">
+      <NodeHead :tagName="currentNode.nodeName" :id="currentNode.id" :className="currentNode.className" />
+      <div class="components-container" v-for="component in currentNode.components">
+        <div class="component-wrap">
+          <NodeComponent :component="component"/>
+        </div>
+      </div>
+  </div>
 </div>
 </template>
 
@@ -17,7 +22,7 @@
 import NodeHead from "./inspector/node-head.vue";
 import NodeComponent from "./inspector/node-component.vue";
 import InspectorUI from "../inspectorUI";
-import AttributeController from "./inspector/AttributeController";
+import {mapState} from "vuex";
 export default {
     props: {
         nodeModel: {
@@ -35,13 +40,18 @@ export default {
 
         }
     },
+    computed:{
+      nodeSelected:function(){
+        return !!this.$store.state.currentNode;
+      },
+      ...mapState(["currentNode"])},
     mounted:function(){
-     this.$refs.inspector.appendChild(InspectorUI.domElement);
+     //this.$refs.inspector.appendChild(InspectorUI.domElement);
     },
     updated:function(){
-      InspectorUI.removeAllFolder();
-      const components = this.nodeModel.components;
-      AttributeController.set(components);
+      // InspectorUI.removeAllFolder();
+      // const components = this.nodeModel.components;
+      // AttributeController.set(components);
     }
 }
 </script>

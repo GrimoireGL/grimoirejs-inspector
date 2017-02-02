@@ -52,7 +52,7 @@ MessageManager.response("fetch-tree",(m)=>{
   }
 });
 
-MessageManager.on("fetch-node", function(m) {
+MessageManager.response("fetch-node", function(m) {
     AttributeWatcher.removeHandlers();
     if(!window.GrimoireJS)return;
     const node = window.GrimoireJS.nodeDictionary[m.key];
@@ -60,14 +60,15 @@ MessageManager.on("fetch-node", function(m) {
         return;
     }
     const components = node._components.map(m => ObjectConverter.fromComponent(m));
-    MessageManager.post({
-        type: "node-info",
+    AttributeWatcher.watch(node);
+    return {
+      node:{
         nodeName: node.name.name,
         className: node.element.className,
         id: node.element.id,
         components: components
-    });
-    AttributeWatcher.watch(node);
+    }
+  };
 });
 
 if (!!window.GrimoireJS) {

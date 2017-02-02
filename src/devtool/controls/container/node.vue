@@ -71,7 +71,7 @@ export default {
         },
         select: function(e) {
             e.stopPropagation();
-            RootModel.nodeModel.selectNode(this.node.key);
+            this.$store.dispatch("selectNode",this.node.key);
         }
     }
 }

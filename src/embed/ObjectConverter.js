@@ -1,3 +1,4 @@
+import AttributeConverter from "./AttributeConverters";
 class ObjectConverter {
     fromElement(element, noRecursive) {
         let children;
@@ -24,50 +25,20 @@ class ObjectConverter {
     }
 
     fromAttribute(attr) {
+      const converter = attr.declaration.converter;
         try {
-            const converter = attr.declaration.converter;
-            switch (converter) {
-                case "Number":
-                case "String":
-                case "Angle2D":
-                case "Boolean":
-                    return {
-                        name: attr.name.name,
-                        value: attr.Value
-                    };
-                case "Color3":
-                case "Color4":
-                    return {
-                        name: attr.name.name,
-                        value: attr.Value.rawElements,
-                        isColor: true
-                    };
-                case "Vector2":
-                case "Vector3":
-                case "Vector4":
-                    return {
-                        name: attr.name.name,
-                        value: attr.Value.rawElements,
-                        isVector: true,
-                        length: ["Vector2", "Vector3", "Vector4"].indexOf(converter) + 2
-                    };
-                case "Rotation3":
-                    return {
-                        name: attr.name.name,
-                        value: attr.Value.eularAngles.rawElements,
-                        isVector: true,
-                        length: 3
-                    };
-                default:
-                    return {
-                        name: attr.name.name,
-                        value: !!attr.Value ? "(Object)[Non Editable]" : "(null or undefined)[Non Editable]"
-                    };
-            }
+            let attrInfo = {
+              converter:converter,
+              name:attr.name.name,
+              value:attr.Value
+            };
+            AttributeConverter(attrInfo);
+            return attrInfo;
         } catch (e) {
             return {
                 name: attr.name.name,
-                value: e.toString()
+                value: e.toString(),
+                converter:converter
             };
         }
     }

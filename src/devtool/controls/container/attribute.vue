@@ -4,6 +4,7 @@ span.attribute-key-name
 span.attribute-value
   color:#A87C6B
 </style>
+
 <template>
 <span v-if="hasValue">
 <span class="attribute-key-name">{{keyName}}</span><span>=</span><span class="attribute-value">"{{value}}"</span>

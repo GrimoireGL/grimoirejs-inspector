@@ -19,7 +19,8 @@ const store = new vuex.Store({
         inspected: {},
         tree:null,
         activeGomlIndex:-1,
-        contextLoaded:false
+        contextLoaded:false,
+        currentNode:null
     },
     mutations: {
         addGoml(state, gomlInfo) {
@@ -32,9 +33,11 @@ const store = new vuex.Store({
         setSelectedGoml(state,index){
           state.activeGomlIndex = index;
         },
+        setCurrentNode(state,nodeInfo){
+          state.currentNode = nodeInfo;
+        },
         setCurrentTree(state,tree){
           state.tree = tree;
-          debugger;
         },
         contextLoaded(state){
           state.contextLoaded = true;
@@ -48,14 +51,23 @@ const store = new vuex.Store({
     },
     actions:{
       async selectGoml(context,index){
+        const gomlId = context.state.gomls[index].key;
         const result = await MessageManager.call({
           type:"fetch-tree",
-          key:context.state.gomls[index].key
+          key:gomlId
         });
+        await context.dispatch("selectNode",gomlId);
         context.commit("setCurrentTree",result.root);
         context.commit("setSelectedGoml",index);
         context.commit("contextLoaded");
       },
+      async selectNode(context,nodeId){
+        const result = await MessageManager.call({
+          type:"fetch-node",
+          key:nodeId
+        });
+        context.commit("setCurrentNode",result.node);
+      }
     }
 });
 
