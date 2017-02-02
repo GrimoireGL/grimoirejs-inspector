@@ -7,27 +7,14 @@ export default function(attr){
         return;
       case "Color3":
       case "Color4":
-          return {
-              name: attr.name.name,
-              value: attr.Value.rawElements,
-              isColor: true
-          };
       case "Vector2":
       case "Vector3":
       case "Vector4":
-          return {
-              name: attr.name.name,
-              value: attr.Value.rawElements,
-              isVector: true,
-              length: ["Vector2", "Vector3", "Vector4"].indexOf(converter) + 2
-          };
+        attr.value = attr.Value.rawElements
+        return;
       case "Rotation3":
-          return {
-              name: attr.name.name,
-              value: attr.Value.eularAngles.rawElements,
-              isVector: true,
-              length: 3
-          };
+        attr.value = attr.Value.eularAngles.rawElements;
+        return;
       default:
           return {
               name: attr.name.name,

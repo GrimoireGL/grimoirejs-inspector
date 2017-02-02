@@ -1,6 +1,9 @@
 <style lang="stylus">
   .unsupported-editor
+    display flex
     text-align center
+    justify-content center
+    flex-direction column
     p
       color yellow
 </style>

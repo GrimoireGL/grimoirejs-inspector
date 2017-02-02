@@ -1,15 +1,23 @@
 <style lang="stylus">
   .node-attribute-header-container
-    background-color:lightgray;
-    display flex;
+    padding 3px 3px
+    border-top #888 solid 1px
+    display flex
     justify-content space-between;
     & p
-      color:dimgray
+      color:white
       font-size:10px
       padding: 0
       letter-spacing:0px
       word-spacing:0px
       margin 0px 5px
+      font-weight 700
+    .converter
+      color #AAA
+      font-weight 400
+      font-size smaller
+      &:before
+        content:" "
     &.grow
       flex-grow:1
       -webkit-flex-grow:1
@@ -17,11 +25,12 @@
 <template>
 <div class="node-attribute-container">
     <div class="node-attribute-header-container">
+        <div>
         <p>{{attribute.name}}</p>
-        <p class="grow"></p>
-        <p>{{attribute.converter}}</p>
+        <p class="converter">({{attribute.converter}})</p>
+      </div>
+        <component :is="editor" :attribute="attribute"/>
     </div>
-    <component :is="editor"/>
 </div>
 </template>
 
@@ -29,10 +38,10 @@
 import EditorFinder from "./editors/EditorFinder";
 export default {
     props: ["attribute"],
-    data:function(){
-      return {
-        editor:EditorFinder(this.attribute.converter)
-      }
+    computed:{
+        editor:function(){
+          return EditorFinder(this.attribute.converter);
+        }
     }
 }
 </script>
