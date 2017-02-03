@@ -1,4 +1,4 @@
-import AttributeConverter from "./AttributeConverters";
+import {Attr2Model} from "./AttributeConverters";
 class ObjectConverter {
     fromElement(element, noRecursive) {
         let children;
@@ -32,7 +32,7 @@ class ObjectConverter {
               name:attr.name.name,
               value:attr.Value
             };
-            AttributeConverter(attrInfo);
+            Attr2Model(attrInfo,attr);
             return attrInfo;
         } catch (e) {
             return {

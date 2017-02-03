@@ -1,5 +1,5 @@
-export default function(attr){
-  switch (attr.converter) {
+export const Attr2Model = function(result,attr){
+  switch (result.converter) {
       case "Number":
       case "String":
       case "Angle2D":
@@ -10,15 +10,20 @@ export default function(attr){
       case "Vector2":
       case "Vector3":
       case "Vector4":
-        attr.value = attr.Value.rawElements
+        result.value = attr.Value.rawElements
         return;
       case "Rotation3":
-        attr.value = attr.Value.eularAngles.rawElements;
+        result.value = attr.Value.eularAngles.rawElements;
         return;
       default:
-          return {
-              name: attr.name.name,
-              value: !!attr.Value ? "(Object)[Non Editable]" : "(null or undefined)[Non Editable]"
-          };
+        result.value = "Non supported";
+        return;
+      }
+}
+
+export const Model2Attr = function(model){
+  switch(model.converter){
+    default:
+      return model.value;
   }
 }

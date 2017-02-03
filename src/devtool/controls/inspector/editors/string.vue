@@ -6,12 +6,17 @@
 </style>
 <template>
 <div class="number-editor">
-  <input type="text" :value="attribute.value"></input>
+  <input type="text" v-model="attribute.value" v-on:change="changed"></input>
 </div>
 </template>
 
 <script>
 export default {
-  props:["attribute"]
+  props:["attribute"],
+  methods:{
+    changed:function(e){
+      this.$store.dispatch("changeValue",this.attribute);
+    }
+  }
 }
 </script>

@@ -9,15 +9,15 @@ module.exports = [{
         alias: {
             'vue$': 'vue/dist/vue.common.js'
         },
-        extensions: [".vue", ".js", ""]
+        extensions: [".vue", ".js"]
     },
     module: {
         loaders: [{
                 test: /\.vue$/,
-                loader: "vue"
+                loader: "vue-loader"
             }, {
                 test: /\.js$/,
-                loader: 'babel',
+                loader: 'babel-loader',
                 // make sure to exclude 3rd party code in node_modules
                 exclude: /node_modules/
             },
@@ -32,12 +32,12 @@ module.exports = [{
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
     resolve: {
-        extensions: [".js", ""]
+        extensions: [".js"]
     },
     module: {
         loaders: [ {
                 test: /\.js$/,
-                loader: 'babel',
+                loader: 'babel-loader',
                 // make sure to exclude 3rd party code in node_modules
                 exclude: /node_modules/
             },
@@ -53,12 +53,12 @@ module.exports = [{
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
     resolve: {
-        extensions: [".js", ""]
+        extensions: [".js"]
     },
     module: {
         loaders: [ {
                 test: /\.js$/,
-                loader: 'babel',
+                loader: 'babel-loader',
                 // make sure to exclude 3rd party code in node_modules
                 exclude: /node_modules/
             },
@@ -74,12 +74,12 @@ module.exports = [{
     // Enable sourcemaps for debugging webpack's output.
     devtool: "source-map",
     resolve: {
-        extensions: [".js", ""]
+        extensions: [".js"]
     },
     module: {
         loaders: [ {
                 test: /\.js$/,
-                loader: 'babel',
+                loader: 'babel-loader',
                 // make sure to exclude 3rd party code in node_modules
                 exclude: /node_modules/
             },

@@ -67,6 +67,12 @@ const store = new vuex.Store({
           key:nodeId
         });
         context.commit("setCurrentNode",result.node);
+      },
+      async changeValue(context,attribute){
+        await MessageManager.post({
+          type:"attribute-change",
+          model:attribute
+        });
       }
     }
 });

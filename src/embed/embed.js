@@ -53,14 +53,14 @@ MessageManager.response("fetch-tree",(m)=>{
 });
 
 MessageManager.response("fetch-node", function(m) {
-    AttributeWatcher.removeHandlers();
+    AttributeWatcher.detach();
     if(!window.GrimoireJS)return;
     const node = window.GrimoireJS.nodeDictionary[m.key];
     if (!node) {
         return;
     }
     const components = node._components.map(m => ObjectConverter.fromComponent(m));
-    AttributeWatcher.watch(node);
+    AttributeWatcher.attach(node);
     return {
       node:{
         nodeName: node.name.name,
@@ -70,6 +70,10 @@ MessageManager.response("fetch-node", function(m) {
     }
   };
 });
+
+MessageManager.on("attribute-change",function(m){
+  AttributeWatcher.set(m.model);
+})
 
 if (!!window.GrimoireJS) {
     MessageManager.post({

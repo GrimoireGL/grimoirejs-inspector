@@ -29,6 +29,18 @@ p.container-context-notfound
 div
   margin:0px
   padding:0px
+input
+  outline 0
+  border:solid 1px #888;
+  -moz-box-shadow: inset 0 0 4px rgba(0,0,0,0.2);
+  -webkit-box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.2);
+  box-shadow: inner 0 0 4px rgba(0, 0, 0, 0.2);
+  background-color dimgray
+  color white
+  padding 0 2px
+  font-size 10px
+  &:focus
+    border:solid 1px #EEA34A;
 </style>
 
 <template>

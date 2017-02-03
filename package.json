@@ -1,37 +1,39 @@
 {
-    "name": "grimoirejs-inspector",
-    "version": "1.0.0",
-    "description": "",
-    "main": "webpack.config.js",
-    "scripts": {
-        "build": "webpack",
-        "start": "npm run build -- --watch"
-    },
-    "author": "",
-    "license": "MIT",
-    "dependencies": {
-        "babel-plugin-transform-runtime": "^6.22.0",
-        "babel-preset-stage-2": "^6.22.0",
-        "is-promise": "^2.1.0",
-        "mutation-summary": "^0.1.1",
-        "uuid": "^3.0.1",
-        "vue": "^2.1.4",
-        "vue-loader": "^10.0.2",
-        "vuex": "^2.1.1"
-    },
-    "devDependencies": {
-        "@types/vue": "^1.0.31",
-        "babel-core": "^6.20.0",
-        "babel-loader": "^6.2.9",
-        "babel-preset-es2015": "^6.18.0",
-        "css-loader": "^0.26.1",
-        "grimoirejs": "^0.11.19",
-        "raw-loader": "^0.5.1",
-        "stylus": "^0.54.5",
-        "stylus-loader": "^2.4.0",
-        "ts-loader": "^1.3.1",
-        "typescript": "^2.1.4",
-        "vue-template-compiler": "^2.1.4",
-        "webpack": "^1.14.0"
-    }
+  "name": "grimoirejs-inspector",
+  "version": "1.0.0",
+  "description": "",
+  "main": "webpack.config.js",
+  "scripts": {
+    "build": "webpack",
+    "start": "npm run build -- --watch"
+  },
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "babel-plugin-transform-runtime": "^6.22.0",
+    "babel-preset-stage-2": "^6.22.0",
+    "is-promise": "^2.1.0",
+    "mutation-summary": "^0.1.1",
+    "uuid": "^3.0.1",
+    "vue": "^2.1.10",
+    "vue-color": "^2.0.5",
+    "vue-loader": "^10.2.3",
+    "vue-style-loader": "^2.0.0",
+    "vuex": "^2.1.1"
+  },
+  "devDependencies": {
+    "@types/vue": "^2.0.0",
+    "babel-core": "^6.22.1",
+    "babel-loader": "^6.2.10",
+    "babel-preset-es2015": "^6.22.0",
+    "css-loader": "^0.26.1",
+    "grimoirejs": "^0.14.3",
+    "raw-loader": "^0.5.1",
+    "stylus": "^0.54.5",
+    "stylus-loader": "^2.4.0",
+    "ts-loader": "^2.0.0",
+    "typescript": "^2.1.5",
+    "vue-template-compiler": "^2.1.10",
+    "webpack": "^2.2.1"
+  }
 }
