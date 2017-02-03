@@ -13,7 +13,7 @@ export const Attr2Model = function(result,attr){
         result.value = attr.Value.rawElements
         return;
       case "Rotation3":
-        result.value = attr.Value.eularAngles.rawElements;
+        result.value = attr.Value.eularAngles.rawElements.map(v=>v / 2 / Math.PI * 360);
         return;
       default:
         result.value = "Non supported";
@@ -23,6 +23,8 @@ export const Attr2Model = function(result,attr){
 
 export const Model2Attr = function(model){
   switch(model.converter){
+    case "Rotation3":
+      return `${model.value[0]},${model.value[1]},${model.value[2]}`
     default:
       return model.value;
   }
