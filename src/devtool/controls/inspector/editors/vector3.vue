@@ -22,11 +22,11 @@
 <template>
 <div class="vector3-editor">
   <p class="x">X</p>
-  <input type="text" v-model="attribute.value[0]" v-on:change="changed"></input>
+  <input type="text" v-model.lazy="attribute.value[0]" v-on:change="changed"></input>
   <p class="y">Y</p>
-  <input type="text" v-model="attribute.value[1]" v-on:change="changed"></input>
+  <input type="text" v-model.lazy="attribute.value[1]" v-on:change="changed"></input>
   <p class="z">Z</p>
-  <input type="text" v-model="attribute.value[2]" v-on:change="changed"></input>
+  <input type="text" v-model.lazy="attribute.value[2]" v-on:change="changed"></input>
 </div>
 </template>
 
@@ -36,6 +36,7 @@ export default {
   methods:{
     changed:function(e){
       this.$store.dispatch("changeValue",this.attribute);
+      console.log("changed");
     }
   }
 }

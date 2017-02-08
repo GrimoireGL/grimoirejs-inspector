@@ -30,7 +30,8 @@ class ObjectConverter {
             let attrInfo = {
               converter:converter,
               name:attr.name.name,
-              value:attr.Value
+              value:attr.Value,
+              id:attr.__id__
             };
             Attr2Model(attrInfo,attr);
             return attrInfo;
@@ -38,7 +39,8 @@ class ObjectConverter {
             return {
                 name: attr.name.name,
                 value: e.toString(),
-                converter:converter
+                converter:converter,
+                id:attr.__id__
             };
         }
     }

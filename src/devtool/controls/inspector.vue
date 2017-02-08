@@ -21,7 +21,6 @@
 <script>
 import NodeHead from "./inspector/node-head.vue";
 import NodeComponent from "./inspector/node-component.vue";
-import InspectorUI from "../inspectorUI";
 import {mapState} from "vuex";
 export default {
     props: {
@@ -44,14 +43,6 @@ export default {
       nodeSelected:function(){
         return !!this.$store.state.currentNode;
       },
-      ...mapState(["currentNode"])},
-    mounted:function(){
-     //this.$refs.inspector.appendChild(InspectorUI.domElement);
-    },
-    updated:function(){
-      // InspectorUI.removeAllFolder();
-      // const components = this.nodeModel.components;
-      // AttributeController.set(components);
-    }
+      ...mapState(["currentNode"])}
 }
 </script>

@@ -24,7 +24,6 @@ span.footer-tabitem
 </template>
 
 <script>
-import RootModel from "../../model/rootModel";
 export default {
     props: ["name", "index"],
     computed: {
@@ -34,7 +33,7 @@ export default {
     },
     methods:{
       toggle:function(){
-        RootModel.setCurrentNode(this.index);
+        this.$store.dispatch("selectGoml",this.index);
       }
     }
 };

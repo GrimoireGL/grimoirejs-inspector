@@ -3,7 +3,9 @@ import ObjectConverter from "./ObjectConverter";
 import AttributeWatcher from "./AttributeWatcher";
 import MutationSummary from "mutation-summary";
 import UUID from "uuid/v4";
+import Responses from "./Responses";
 MessageManager.on("sync-devtool", function() {
+  console.log("sync-devtool");
     if (!!window.GrimoireJS) {
         function observeRoot(element) {
             const observer = new MutationObserver((mutations) => {
@@ -43,37 +45,14 @@ MessageManager.on("sync-devtool", function() {
     }
 });
 
-MessageManager.response("fetch-tree",(m)=>{
-  if(!window.GrimoireJS)return;
-  const rootNode = window.GrimoireJS.rootNodes[m.key];
-  if(rootNode === void 0)return;
-  return {
-    root:ObjectConverter.fromElement(rootNode.element)
-  }
-});
-
-MessageManager.response("fetch-node", function(m) {
-    AttributeWatcher.detach();
-    if(!window.GrimoireJS)return;
-    const node = window.GrimoireJS.nodeDictionary[m.key];
-    if (!node) {
-        return;
-    }
-    const components = node._components.map(m => ObjectConverter.fromComponent(m));
-    AttributeWatcher.attach(node);
-    return {
-      node:{
-        nodeName: node.name.name,
-        className: node.element.className,
-        id: node.element.id,
-        components: components
-    }
-  };
-});
-
 MessageManager.on("attribute-change",function(m){
   AttributeWatcher.set(m.model);
-})
+});
+
+// register response handlers
+for(let message in Responses){
+  MessageManager.response(message,Responses[message]);
+}
 
 if (!!window.GrimoireJS) {
     MessageManager.post({

@@ -2,20 +2,10 @@ import MessageManager from "../MessageManager";
 import store from "./storeRoot";
 class RootModel {
     constructor() {
-        MessageManager.on("initialize", (m) => {
-            store.commit("reset");
-        });
-        MessageManager.on("new-tree", (m) => {
-            store.commit("addGoml", m.result);
-        });
-        MessageManager.on("node-added", (m) => { //TODO fix
-            const index = this.findNodesIndex(m.root);
-            this.nodes[index] = m.root;
-            store.dispatch("selectGoml",index);
-        });
-        MessageManager.post({
-            type: "sync-devtool"
-        });
+        // MessageManager.on("initialize", (m) => {
+        //     store.commit("reset");
+        // });
+
         this.isNotFirstLoad = true;
     }
 

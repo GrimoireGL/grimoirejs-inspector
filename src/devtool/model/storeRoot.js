@@ -3,6 +3,8 @@ import vue from "vue";
 import MessageManager from "../MessageManager";
 vue.use(vuex);
 
+let attributeCache = {};
+
 function toLabel(goml) {
     let result = ""
     result += goml.id !== "" ? "#" + goml.id : "";
@@ -26,7 +28,7 @@ const store = new vuex.Store({
         addGoml(state, gomlInfo) {
             state.gomls = state.gomls.concat([gomlInfo]);
             state.labels = state.labels.concat([toLabel(gomlInfo)]);
-            if(state.gomls.length === 1){
+            if(state.gomls.length === 1){ // if new tree is first one.
               store.dispatch("selectGoml",0);
             }
         },
@@ -35,6 +37,22 @@ const store = new vuex.Store({
         },
         setCurrentNode(state,nodeInfo){
           state.currentNode = nodeInfo;
+          attributeCache = {};
+          for(let componentName in nodeInfo.components)
+          {
+              const componentInfo = nodeInfo.components[componentName];
+              for(let attributeName in componentInfo.attributes)
+              {
+                const attrInfo = componentInfo.attributes[attributeName];
+                attributeCache[attrInfo.id] = attrInfo;
+              }
+          }
+        },
+        setAttributeChanges(state,attributes){
+          for(let i = 0; i < attributes.length; i++){
+            const change = attributes[i];
+            attributeCache[change.id].value = change.value;
+          }
         },
         setCurrentTree(state,tree){
           state.tree = tree;
@@ -47,6 +65,9 @@ const store = new vuex.Store({
             state.labels = [];
             state.activeGomlIndex = -1;
             state.contextLoaded = false;
+            state.inspected = {};
+            state.tree = null;
+            state.currentNode = null;
         }
     },
     actions:{
@@ -56,10 +77,10 @@ const store = new vuex.Store({
           type:"fetch-tree",
           key:gomlId
         });
-        await context.dispatch("selectNode",gomlId);
         context.commit("setCurrentTree",result.root);
         context.commit("setSelectedGoml",index);
         context.commit("contextLoaded");
+        context.dispatch("selectNode",gomlId);
       },
       async selectNode(context,nodeId){
         const result = await MessageManager.call({
@@ -73,8 +94,25 @@ const store = new vuex.Store({
           type:"attribute-change",
           model:attribute
         });
+      },
+      async reload(context){
+        context.commit("reset");
+        MessageManager.post({
+            type: "sync-devtool"
+        });
       }
     }
 });
 
+MessageManager.on("attribute-changed",(v)=>{
+  store.commit("setAttributeChanges",v.changes);
+});
+
+MessageManager.on("new-tree", (m) => {
+    store.commit("addGoml", m.result);
+});
+
+MessageManager.on("initialize", (m) => {
+    store.dispatch("reload");
+});
 export default store;
