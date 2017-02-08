@@ -36,7 +36,6 @@ export default {
   methods:{
     changed:function(e){
       this.$store.dispatch("changeValue",this.attribute);
-      console.log("changed");
     }
   }
 }

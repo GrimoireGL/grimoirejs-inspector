@@ -5,7 +5,6 @@ import MutationSummary from "mutation-summary";
 import UUID from "uuid/v4";
 import Responses from "./Responses";
 MessageManager.on("sync-devtool", function() {
-  console.log("sync-devtool");
     if (!!window.GrimoireJS) {
         function observeRoot(element) {
             const observer = new MutationObserver((mutations) => {

@@ -17,10 +17,12 @@
     <h1>
       <span>&lt;{{tagName}}<span class="node-head-suffix"><span v-if="haveId">#{{id}}</span><span v-if="haveClass">.{{className}}</span></span>&gt;</span>
     </h1>
+    <!-- <Chrome value="test"  @change-color="onChange"/> -->
 </div>
 </template>
 
 <script>
+import {Chrome} from "vue-color";
 export default {
     props: ["tagName","id","className"],
     computed:{
@@ -29,6 +31,31 @@ export default {
       },
       haveClass:function(){
         return this.className !== "" && !!this.className;
+      }
+    },
+    components:{
+      Chrome
+    },
+    data:function(){
+      let test = {
+        colors:{
+          hex:"#FF0000",
+          rgba:{
+            r:255,
+            g:0,
+            b:0,
+            a:1
+          },
+          a:1
+        }
+      };
+      return {
+        test
+      }
+    },
+    methods:{
+      onChange:function(v){
+        console.log(v);
       }
     }
 }

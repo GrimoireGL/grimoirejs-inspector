@@ -1,22 +1,25 @@
 <style lang="stylus">
-
+.color4-editor
+  display flex
+  flex-direction column
+  justify-content center
 </style>
 <template>
 <div class="color4-editor">
-  <Chrome :v-model="color"/>
+  <ColorBox v-model="attribute.value" v-on:colorChanged="changed"/>
 </div>
 </template>
 
 <script>
-import {Chrome} from "vue-color";
+import ColorBox from "../../common/color-box.vue";
 export default {
   props:["attribute"],
   components:{
-    Chrome
+    ColorBox
   },
-  data:function(){
-    return {
-      color:{}
+  methods:{
+    changed:function(v){
+      this.$store.dispatch("changeValue",this.attribute);
     }
   }
 }

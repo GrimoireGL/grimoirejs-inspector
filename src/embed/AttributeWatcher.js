@@ -77,8 +77,6 @@ class AttributeWatcher {
       if(this.observing){
         this.ignoreChange = true;
         this.observing.setAttribute(model.name,Model2Attr(model));
-      }else{
-        console.warn("There is no observing node");
       }
     }
 }
