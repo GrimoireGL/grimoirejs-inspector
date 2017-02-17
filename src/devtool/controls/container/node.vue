@@ -16,7 +16,8 @@ span.node-expander-points
   color:dimgray
   font-size:10px
 p.selected-node-highlight
-  background-color:#502D15
+  font-weight 800
+  background-color:#454545
 </style>
 <template>
 <div class="container-node-indent" v-on:click="select">
