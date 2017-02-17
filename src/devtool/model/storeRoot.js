@@ -18,7 +18,6 @@ const store = new vuex.Store({
     state: {
         gomls: [],
         labels: [],
-        inspected: {},
         tree:null,
         activeGomlIndex:-1,
         contextLoaded:false,
@@ -65,10 +64,17 @@ const store = new vuex.Store({
             state.labels = [];
             state.activeGomlIndex = -1;
             state.contextLoaded = false;
-            state.inspected = {};
             state.tree = null;
             state.currentNode = null;
         }
+    },
+    getters:{
+      currentNodeId:function(state){
+        if(state.currentNode === null){
+          return null;
+        }
+        return state.currentNode.nodeId;
+      }
     },
     actions:{
       async selectGoml(context,index){
@@ -87,6 +93,7 @@ const store = new vuex.Store({
           type:"fetch-node",
           key:nodeId
         });
+        result.node.nodeId = nodeId;
         context.commit("setCurrentNode",result.node);
       },
       async changeValue(context,attribute){

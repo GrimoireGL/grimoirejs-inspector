@@ -15,10 +15,12 @@ span.node-expander-points
   cursor:pointer
   color:dimgray
   font-size:10px
+p.selected-node-highlight
+  background-color:#502D15
 </style>
 <template>
 <div class="container-node-indent" v-on:click="select">
-    <p class="node-tag">
+    <p :class="{'node-tag':true,'selected-node-highlight':isSelected}">
         <span class="node-tag-expander" v-on:click="toggle" v-if="!open && hasChild">▶︎</span>
         <span class="node-tag-expander" v-on:click="toggle" v-if="open && hasChild">▼</span>
         <span>&lt;{{node.tagName}}</span>
@@ -36,7 +38,7 @@ span.node-expander-points
             <Node :node="child" :layer="childLayer" />
         </div>
     </div>
-    <p v-if="hasChild && open" class="node-tag">
+    <p v-if="hasChild && open" :class="{'node-tag':true,'selected-node-highlight':isSelected}">
         <span>&lt;/{{node.tagName}}&gt;</span>
     </p>
 </div>
@@ -45,6 +47,7 @@ span.node-expander-points
 <script>
 import Attribute from "./attribute.vue";
 import RootModel from "../../model/rootModel";
+import {mapGetters} from "vuex";
 export default {
     name: "Node",
     props: ["node", "layer"],
@@ -62,7 +65,11 @@ export default {
         },
         childLayer: function() {
             return this.layer + 1;
-        }
+        },
+        isSelected:function(){
+          return this.node.key === this.currentNodeId;
+        },
+        ...mapGetters(["currentNodeId"])
     },
     methods: {
         toggle: function(e) {
