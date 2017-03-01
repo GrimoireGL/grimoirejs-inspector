@@ -1,6 +1,7 @@
 import vuex from "vuex";
 import vue from "vue";
 import MessageManager from "../MessageManager";
+import AnimationStore from "./animationStore";
 vue.use(vuex);
 
 let attributeCache = {};
@@ -21,7 +22,8 @@ const store = new vuex.Store({
         tree:null,
         activeGomlIndex:-1,
         contextLoaded:false,
-        currentNode:null
+        currentNode:null,
+        currentTab:"Animation" // TODO this should be "Node"
     },
     mutations: {
         addGoml(state, gomlInfo) {
@@ -66,6 +68,9 @@ const store = new vuex.Store({
             state.contextLoaded = false;
             state.tree = null;
             state.currentNode = null;
+        },
+        setCurrentTab(state,tabName){
+          state.currentTab = tabName;
         }
     },
     getters:{
@@ -108,6 +113,9 @@ const store = new vuex.Store({
             type: "sync-devtool"
         });
       }
+    },
+    modules:{
+      animation:AnimationStore
     }
 });
 

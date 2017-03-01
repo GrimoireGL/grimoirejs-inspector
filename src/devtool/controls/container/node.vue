@@ -17,7 +17,7 @@ span.node-expander-points
   font-size:10px
 p.selected-node-highlight
   font-weight 800
-  background-color:#454545
+  background-color:#454545g
 </style>
 <template>
 <div class="container-node-indent" v-on:click="select">
@@ -47,7 +47,6 @@ p.selected-node-highlight
 
 <script>
 import Attribute from "./attribute.vue";
-import RootModel from "../../model/rootModel";
 import {mapGetters} from "vuex";
 export default {
     name: "Node",

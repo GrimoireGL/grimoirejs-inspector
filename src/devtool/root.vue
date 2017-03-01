@@ -41,6 +41,9 @@ input
   font-size 10px
   &:focus
     border:solid 1px #EEA34A;
+
+.container-component-root
+  height 100%
 </style>
 
 <template>
@@ -49,38 +52,48 @@ input
         <div class="container">
             <div class="container-main">
                 <p class="container-context-notfound" v-if="!contextLoaded">Grimoire.js context was not found.</p>
-                <Container :rootNode="model.currentNodes" :model="model" v-else/>
+                <div v-else class="container-component-root">
+                    <NodeTab v-if="nodeTab"/>
+                    <AnimationTab v-if="animationTab"/>
+                </div>
             </div>
             <div class="container-side">
-                <Inspector :nodeModel="model.nodeModel"/>
+                <Inspector />
             </div>
         </div>
     </div>
     <div class="root-footer">
-        <FooterComponent :model="model"/>
+        <FooterComponent/>
     </div>
 </div>
 </template>
 
 <script>
 import FooterComponent from "./controls/footer-component.vue";
-import Container from "./controls/container.vue";
+import NodeTab from "./controls/node-tab.vue";
 import Inspector from "./controls/inspector.vue";
 import storeRoot from "./model/storeRoot";
-import {mapState} from "vuex";
+import AnimationTab from "./controls/animation/animation-tab.vue";
+import {
+    mapState
+} from "vuex";
 export default {
-    props:{},
-    store:storeRoot,
+    props: {},
+    store: storeRoot,
     components: {
-        FooterComponent: FooterComponent,
-        Container: Container,
-        Inspector: Inspector
+        FooterComponent,
+        Inspector,
+        NodeTab,
+        AnimationTab
     },
-    data: function() {
-        return {
-            model:{}
+    computed: {
+        ...mapState(["contextLoaded", "currentTab"]),
+        nodeTab: function() {
+            return this.currentTab === "Node";
+        },
+        animationTab: function() {
+            return this.currentTab === "Animation";
         }
-    },
-    computed:mapState(["contextLoaded"])
+    }
 }
 </script>

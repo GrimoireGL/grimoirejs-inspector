@@ -18,7 +18,7 @@ p
 
 <template>
 <div class="footer-container">
-    <span class="icon-embed2"></span>
+    <span class="icon-embed2" v-on:click="toggle"></span>
     <span v-for="(item,index) in labels">
       <TabItem :index="index" :name="item"/>
     </span>
@@ -26,13 +26,25 @@ p
 </template>
 
 <script>
-import {mapState} from "vuex";
+import {
+    mapState
+} from "vuex";
 import TabItem from "./footer/tabitem.vue";
 
 export default {
     components: {
         TabItem: TabItem
     },
-    computed: mapState(["labels"])
+    computed: mapState(["labels"]),
+    methods: {
+        toggle() {
+            // TODO show something context menu to select
+            if (this.$store.state.currentTab === "Node") {
+                this.$store.commit("setCurrentTab", "Animation");
+            } else {
+                this.$store.commit("setCurrentTab", "Node");
+            }
+        }
+    }
 }
 </script>
