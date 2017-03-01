@@ -27,6 +27,7 @@ export default {
     padding 0 10px
     border-right solid 1px black
     background-color dimgray
+    z-index 100
     .timeview-labels-container
       display flex
       flex 1

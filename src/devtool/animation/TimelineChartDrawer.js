@@ -1,3 +1,4 @@
+import GridHighlighter from "./GridHighlighter";
 export default class TimeLineChartDrawer {
   constructor(canvas){
     this.canvas = canvas;
@@ -11,20 +12,20 @@ export default class TimeLineChartDrawer {
   }
 
   onResize(){
+    this.canvas.style.width = this.canvas.parentElement.clientWidth  + "px";
+    this.canvas.style.height = this.canvas.parentElement.clientHeight + "px";
     this.canvas.height = this.canvas.parentElement.clientHeight * 2;
     this.canvas.width = this.canvas.parentElement.clientWidth * 2;
-    this.canvas.style.width = this.canvas.parentElement.clientWidth + "px";
-    this.canvas.style.height = this.canvas.parentElement.clientHeight + "px";
     this.onDraw();
   }
 
   onDraw(){
+    this._clear();
+    this._drawGrid();
     if(this.expand){
-      this._drawVertical(10);
-      this._drawVertical(20);
-      this._drawVertical(30);
+
     }else{
-      this._clear();
+
     }
   }
 
@@ -39,5 +40,25 @@ export default class TimeLineChartDrawer {
     this.context.lineWidth = width;
     this.context.strokeStyle = color;
     this.context.stroke();
+  }
+
+  _drawGrid(){
+    if(this.offsetX === void 0 || this.scale === void 0){
+      return;
+    }
+    let stride =  GridHighlighter.getStride(this.scale);
+    let lastX = stride -  (this.offsetX % stride);
+    while(true){
+      let x = lastX * this.scale;
+      if(x > this.canvas.width){
+        break;
+      }
+      let actX = lastX + this.offsetX;
+      const importance = GridHighlighter.getImportance(this.scale,actX);
+      const width = GridHighlighter.getWidthByImportance(importance);
+      const style = GridHighlighter.getStyleByImportance(importance);
+      this._drawVertical(x * GridHighlighter.gridScale,width,style);
+      lastX += stride;
+    }
   }
 }

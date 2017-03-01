@@ -2,7 +2,7 @@
   <div :class="{'time-view-root':true,'expand':open}">
     <Expander v-model="open"/>
     <TimeViewLabel :model="model" :open="open"/>
-    <Chart :expand="open"/>
+    <Chart :expand="open" :offsetX="offsetX" :scale="scale" v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged"/>
   </div>
 </template>
 
@@ -11,6 +11,7 @@ import Expander from "./timeview-expander.vue";
 import TimeViewLabel from "./timeview-label.vue";
 import Chart from "./timeview-chart.vue";
 export default {
+  props:["offsetX","scale"],
   data(){
     return {
       open:false,
@@ -41,6 +42,19 @@ export default {
     Expander,
     TimeViewLabel,
     Chart
+  },
+  methods:{
+    offsetXChanged(v){
+      this.$emit("offsetXChanged",v);
+    },
+    scaleChanged(v){
+      this.$emit("scaleChanged",v);
+    }
+  },
+  mounted(){
+    this.$watch("open",function(){
+      this.$emit("expandChanged");
+    })
   }
 }
 </script>

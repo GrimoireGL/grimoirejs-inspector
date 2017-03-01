@@ -24,6 +24,8 @@ export default {
 <style lang="stylus">
   .timeview-expander
     height 100%
+    width 16px
+    z-index 100
     p:hover
       cursor pointer
       user-select none
