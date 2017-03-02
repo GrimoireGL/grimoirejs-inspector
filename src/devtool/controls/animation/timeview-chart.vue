@@ -39,7 +39,7 @@ export default {
             if (Math.abs(e.deltaY) >= 0.0) {
                 let scale = this.scale;
                 scale*= 1.0 + e.deltaY * 0.01;
-                if (this.scale !== scale && scale > 0.0001 && scale < 10000) {
+                if (this.scale !== scale && scale > 0.0001 && scale < 10) {
                     this.$emit("scaleChanged", scale);
                 }
             }

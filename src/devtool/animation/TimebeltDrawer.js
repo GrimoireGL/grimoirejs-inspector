@@ -1,4 +1,4 @@
-import GridHighlighter from "./GridHighlighter";
+import LayoutCalculator from "./LayoutCalculator";
 export default class TimebeltDrawer {
     constructor(canvas) {
         this.canvas = canvas;
@@ -46,21 +46,15 @@ export default class TimebeltDrawer {
         if (this.offsetX === void 0 || this.scale === void 0) {
             return;
         }
-        let stride = GridHighlighter.getStride(this.scale);
-        let lastX =  - (this.offsetX % stride);
-        while (true) {
-            let x = lastX * this.scale;
-            if (x > this.canvas.width) {
+        for(let grid of LayoutCalculator.gridEnumrator(this.scale,this.offsetX)){
+            if (grid.screenX > this.canvas.width) {
                 break;
             }
-            let actX = lastX + this.offsetX;
-            const importance = GridHighlighter.getImportance(this.scale,actX);
-            const height = GridHighlighter.getHeightByImportance(importance);
-            const width = GridHighlighter.getWidthByImportance(importance);
-            const style = GridHighlighter.getStyleByImportance(importance);
-            this._drawVertical(x * GridHighlighter.gridScale,height,width,style);
-            this._drawText(actX.toFixed(2),x * GridHighlighter.gridScale,height + 3,style);
-            lastX += stride;
+            const height = LayoutCalculator.getHeightByImportance(grid.importance);
+            const width = LayoutCalculator.getWidthByImportance(grid.importance);
+            const style = LayoutCalculator.getStyleByImportance(grid.importance);
+            this._drawVertical(grid.screenX,height,width,style);
+            this._drawText(LayoutCalculator.toTimeLabel(this.scale,grid.time),grid.screenX,height + 3,style);
         }
     }
 }

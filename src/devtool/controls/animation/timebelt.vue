@@ -7,7 +7,7 @@
     <div class="timebelt-container">
       <canvas ref="timebelt"/>
       <div class="timebelt-cursor-container">
-        <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight" :offsetX="offsetX" :currentTime="currentTime"/>
+        <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight" :offsetX="offsetX" :currentTime="currentTime" :scale="scale"/>
       </div>
     </div>
   </div>

@@ -11,8 +11,9 @@
 </template>
 
 <script>
+import LayoutCalculator from "../../animation/LayoutCalculator";
 export default {
-  props:["lineHeight","offsetX","currentTime"],
+  props:["lineHeight","offsetX","scale","currentTime"],
   computed:{
     calcY2(){
       return this.lineHeight + 19;
@@ -21,7 +22,7 @@ export default {
       return `0 0 5 ${this.calcY2 + 19}`;
     },
     calcLeft(){
-      return this.currentTime - this.offsetX;
+      return (this.currentTime - this.offsetX) * this.scale;
     }
   }
 }
