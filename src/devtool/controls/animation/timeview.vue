@@ -2,7 +2,7 @@
   <div :class="{'time-view-root':true,'expand':open}">
     <Expander v-model="open"/>
     <TimeViewLabel :model="model" :open="open"/>
-    <Chart :expand="open" :offsetX="offsetX" :scale="scale" v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged"/>
+    <Chart :expand="open" :offsetX="offsetX" :scale="scale" :model="model" v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged"/>
   </div>
 </template>
 
@@ -33,6 +33,28 @@ export default {
           {
             name:"W",
             color:"#999999"
+          }
+        ],
+        timelines:[
+          {
+            times:[100,200,300,400],
+            values:[10,80,-10,120],
+            effects:[{type:"BEZIER",control:[10,1900,30,40]},{},{}]
+          },
+          {
+            times:[100,200,300,400],
+            values:[30,-80,120,20],
+            effects:[{type:"LINEAR"},{},{}]
+          },
+          {
+            times:[100,200,300,400],
+            values:[300,-80,420,120],
+            effects:[{type:"LINEAR"},{},{}]
+          },
+          {
+            times:[100,200,300,400],
+            values:[120,-30,900,1200],
+            effects:[{type:"LINEAR"},{},{}]
           }
         ]
       }

@@ -3,7 +3,7 @@
     <p>{{model.name}}</p>
     <div class="timeview-labels-container">
       <p v-for="label of model.labels" v-if="open">{{label.name}}
-        <Point :color="label.color"/>
+        <!-- <Point :color="label.color"/> -->
       </p>
     </div>
   </div>

@@ -30,7 +30,6 @@ MessageManager.on("sync-devtool", function() {
             });
         }
 
-
         for (let key in window.GrimoireJS.rootNodes) {
             const root = window.GrimoireJS.rootNodes[key];
             const message = ObjectConverter.fromElement(root.companion.get("scriptElement"), true);
@@ -52,7 +51,6 @@ MessageManager.on("attribute-change",function(m){
 for(let message in Responses){
   MessageManager.response(message,Responses[message]);
 }
-
 if (!!window.GrimoireJS) {
     MessageManager.post({
         type: "initialize"
@@ -76,3 +74,6 @@ const iframeObserver = new MutationSummary({
         element: "iframe"
     }]
 });
+
+// Messaging for mocker
+//const messagePort = new MessagePort();

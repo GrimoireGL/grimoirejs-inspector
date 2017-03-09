@@ -20,6 +20,7 @@ export default class LayoutCalculator {
       }
     }
 
+
     static toTimeLabel(scale,time){
       const stride = LayoutCalculator.getStride(scale);
       const importance = LayoutCalculator.getImportance(scale,time);
@@ -44,6 +45,11 @@ export default class LayoutCalculator {
     static timeToScreenX(scale,offsetX,time){
       const timeFromLeft = time - offsetX;
       return scale * timeFromLeft * LayoutCalculator.gridScale;
+    }
+
+    static screenXToTime(scale,offsetX,screenX){
+      const scaled = LayoutCalculator.timeToScreenX(scale,0,1);
+      return offsetX + screenX / scaled;
     }
 
     static getImportance(scale, value) {

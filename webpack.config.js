@@ -95,5 +95,26 @@ module.exports = [{
 
             ]
         }
+    },
+    {
+        entry: "./src/mock/mock.js",
+        output: {
+            filename: "./lib/mock.js"
+        },
+        // Enable sourcemaps for debugging webpack's output.
+        devtool: "source-map",
+        resolve: {
+            extensions: [".js"]
+        },
+        module: {
+            loaders: [{
+                    test: /\.js$/,
+                    loader: 'babel-loader',
+                    // make sure to exclude 3rd party code in node_modules
+                    exclude: /node_modules/
+                },
+
+            ]
+        }
     }
 ]

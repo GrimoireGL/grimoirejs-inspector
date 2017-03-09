@@ -5,7 +5,7 @@
   "main": "webpack.config.js",
   "scripts": {
     "build": "webpack",
-    "start": "npm run build -- --watch"
+    "start": "hs & npm run build -- --watch"
   },
   "author": "",
   "license": "MIT",

@@ -1,18 +1,25 @@
 import UUID from "uuid/v4";
 class MessageManager {
     constructor() {
-        this.bpc = chrome.runtime.connect({name: "panel"});
-        this.bpc.onMessage.addListener(this.onRecieve.bind(this));
+        if(chrome.devtools){ // For Devtool
+          this.bpc = chrome.runtime.connect({name: "panel"});
+          this.bpc.onMessage.addListener(this.onRecieve.bind(this));
+          this.postDelegate = (message) => this.bpc.postMessage(message);
+        }else if(window && window.gri && window.gri.messagePostDelegate){ // For mock page
+          this.postDelegate = (message) => window.gri.messagePostDelegate(message);
+        }else{
+          this.postDelegate = (message) => console.warn(message);
+        }
         this.handlers = {};
     }
 
     post(message) {
         this.verifyMessage(message);
         const nm = Object.assign({
-            $tabId: chrome.devtools.inspectedWindow.tabId,
+            $tabId: chrome && chrome.devtools ? chrome.devtools.inspectedWindow.tabId : 0,
             $source: "grimoire-inspector-dev-tool"
         }, message);
-        this.bpc.postMessage(nm);
+        this.postDelegate(nm);
     }
     // Devtool -> Embed -> Devtool
     call(message) {
@@ -67,7 +74,7 @@ class MessageManager {
 
     init() {
         // connect to background page
-        if (chrome.devtools.inspectedWindow) {
+        if ((chrome && !chrome.devtools)/*For mock*/ || chrome.devtools.inspectedWindow) {
             this.post({
               type:"connection-establish"
             })
