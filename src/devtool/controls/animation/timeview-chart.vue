@@ -3,7 +3,10 @@
     <canvas ref="chart" v-on:wheel.prevent="wheel" v-on:mousemove="move"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
-          <Point :color="value.color" :left="value.left" :top="value.top" v-on:drag="handleDrag(value,$event)"/>
+          <Point :color="value.color" :left="value.left" :top="value.top" v-on:drag="handleDrag(value,$event)" size="4"/>
+      </div>
+      <div v-for="(value,index) in effects" class="effects">
+        <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetX="offsetX" :scale="scale" v-on:effectChanged="effectChanged(value,$event)"/>
       </div>
     </div>
   </div>
@@ -13,6 +16,7 @@
 import TimeLineChartDrawer from "../../animation/TimeLineChartDrawer";
 import Point from "./timeline-point.vue";
 import LayoutCalculator from "../../animation/LayoutCalculator";
+import TimeEffect from "../../animation/TimeEffect";
 export default {
     components:{Point},
     props: ["expand", "offsetX", "scale","model"],
@@ -35,6 +39,31 @@ export default {
               left:LayoutCalculator.timeToScreenX(this.scale,this.offsetX,timeline.times[j]) / 2,
               top: timeline.values[j] / 2
             })
+          }
+        }
+        return arr;
+      },
+      effects(){
+        const arr = [];
+        for(let i = 0; i < this.model.labels.length; i++){
+          const label = this.model.labels[i];
+          const timeline = this.model.timelines[i];
+          for(let j = 0; j < timeline.effects.length; j++){
+            const effect = timeline.effects[j];
+            const effectControl = TimeEffect.getOptionalControl(effect.type);
+            if(effectControl === null){
+              continue;
+            }
+            const p1 = [timeline.times[j],timeline.values[j]];
+            const p2 = [timeline.times[j + 1],timeline.values[j + 1]];
+            arr.push({
+              control:effectControl,
+              effect:effect,
+              timeline:timeline,
+              index:j,
+              p1:p1,
+              p2:p2
+            });
           }
         }
         return arr;
@@ -89,7 +118,6 @@ export default {
         },
         move(e){
           this.lastX = e.offsetX;
-          console.log(e.offsetX,LayoutCalculator.screenXToTime(this.scale,this.offsetX,this.lastX));
         },
         calcDisplayPx(t){
           return LayoutCalculator.timeToScreenX(t) + "px";
@@ -114,6 +142,10 @@ export default {
           }
           val.timeline.times.splice(val.index,1,val.timeline.times[val.index] + xdiff);
           val.timeline.values.splice(val.index,1,val.timeline.values[val.index] + e.movementY);
+          this.chartDrawer.onDraw();
+        },
+        effectChanged(v,e){
+          v.timeline.effects.splice(v.index,1,e);
           this.chartDrawer.onDraw();
         }
     }

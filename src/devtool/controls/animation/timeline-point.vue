@@ -3,7 +3,7 @@
    <g>
     <title>Layer 1</title>
       <g id="svg_2">
-        <circle :fill="color" stroke="#000000" :stroke-width="strokeWidth" cx="6" cy="6" r="4" id="svg_1"/>
+        <circle :fill="color" stroke="#000000" :stroke-width="strokeWidth" cx="6" cy="6" :r="size" id="svg_1"/>
       </g>
    </g>
   </svg>
@@ -11,7 +11,7 @@
 
 <script>
 export default {
-  props:["color","left","top"],
+  props:["color","left","top","size"],
   data(){
     return {
       mouseon:false,

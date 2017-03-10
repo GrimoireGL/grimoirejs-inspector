@@ -39,7 +39,7 @@ export default {
           {
             times:[100,200,300,400],
             values:[10,80,-10,120],
-            effects:[{type:"BEZIER",control:[10,1900,30,40]},{},{}]
+            effects:[{type:"BEZIER",control:[100,100,200,40]},{},{}]
           },
           {
             times:[100,200,300,400],

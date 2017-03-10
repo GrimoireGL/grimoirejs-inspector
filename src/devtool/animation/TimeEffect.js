@@ -1,4 +1,5 @@
 import LayoutCalculator from "./LayoutCalculator";
+import BezierControl from "../controls/animation/optional/bezier-control.vue";
 export default class TimeEffect{
   static drawEffect(context,scale,offset,effect,current,next){
     switch(effect.type){
@@ -9,6 +10,15 @@ export default class TimeEffect{
         break;
       default:
         throw new Error("Unsupported animation effect");
+    }
+  }
+
+  static getOptionalControl(type){
+    switch(type){
+      case "BEZIER":
+        return BezierControl;
+      default:
+        return null;
     }
   }
 }
