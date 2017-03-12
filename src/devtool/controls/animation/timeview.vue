@@ -20,15 +20,15 @@ export default {
         labels:[
           {
             name:"X",
-            color:"#FF0000"
+            color:"#8E0F0F"
           },
           {
             name:"Y",
-            color:"#00FF00"
+            color:"#0F8E0F"
           },
           {
             name:"Z",
-            color:"#0000FF"
+            color:"#0F0F8E"
           },
           {
             name:"W",
@@ -39,7 +39,7 @@ export default {
           {
             times:[100,200,300,400],
             values:[10,80,-10,120],
-            effects:[{type:"BEZIER",control:[100,100,200,40]},{},{}]
+            effects:[{type:"BEZIER",control:[100,100,180,40]},{},{}]
           },
           {
             times:[100,200,300,400],

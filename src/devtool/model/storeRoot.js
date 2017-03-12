@@ -23,7 +23,7 @@ const store = new vuex.Store({
         activeGomlIndex:-1,
         contextLoaded:false,
         currentNode:null,
-        currentTab:"Animation" // TODO this should be "Node"
+        currentTab:"Node" // TODO this should be "Node"
     },
     mutations: {
         addGoml(state, gomlInfo) {

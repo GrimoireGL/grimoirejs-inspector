@@ -5,7 +5,7 @@
       <p>Properties</p>
     </div>
     <div class="timebelt-container">
-      <canvas ref="timebelt"/>
+      <canvas ref="timebelt" v-on:wheel.prevent="wheel" v-on:mousemove="move"/>
       <div class="timebelt-cursor-container">
         <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight" :offsetX="offsetX" :currentTime="currentTime" :scale="scale"/>
       </div>
@@ -17,8 +17,14 @@
 <script>
 import TimebeltDrawer from "../../animation/TimebeltDrawer";
 import TimeCursor from "./timeline-cursor.vue";
+import LayoutCalculator from "../../animation/LayoutCalculator";
 export default {
     props: ["offsetX", "scale","timeViewHeight","currentTime"],
+    data(){
+      return {
+        lastX:0
+      }
+    },
     mounted() {
         this.beltDrawer = new TimebeltDrawer(this.$refs.timebelt);
         this.$watch("offsetX", () => {
@@ -34,6 +40,24 @@ export default {
             immediate: true
         });
         this.beltDrawer.onResize();
+    },
+    methods:{
+      wheel(e){
+        if (Math.abs(e.deltaY) >= 0.0) {
+            let scale = this.scale;
+            const lastScale = scale;
+            scale*= 1.0 + e.deltaY * 0.01;
+            if (this.scale !== scale && scale > 0.0001 && scale < 10) {
+                const timeDelta = LayoutCalculator.screenXToTime(scale,this.offsetX,this.lastX)
+                - LayoutCalculator.screenXToTime(lastScale,this.offsetX,this.lastX);
+                this.$emit("offsetXChanged",this.offsetX - timeDelta * 2.0)
+                this.$emit("scaleChanged", scale);
+            }
+        }
+      },
+      move(e){
+        this.lastX = e.offsetX;
+      }
     },
     components: {
         TimeCursor

@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="timeline-root">
-    <TimeBelt :offsetX="offsetX" :scale="scale" :timeViewHeight="timeViewHeight" currentTime="200"/>
+    <TimeBelt :offsetX="offsetX" :scale="scale" :timeViewHeight="timeViewHeight" currentTime="200"  v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged"/>
     <div class="timeview-scroll-container">
       <div ref="timeviews" class="timeview-container">
         <Timeview :offsetX="offsetX" :scale="scale" v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged" v-on:expandChanged="expandChanged"/>

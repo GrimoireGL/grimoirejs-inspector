@@ -2,7 +2,7 @@
   <div class="bezier-controls">
     <Point color="yellow" size="2" :left="c1ScreenX" :top="effect.control[1]" v-on:drag="handleDrag(0,$event)"/>
     <Point color="yellow" size="2" :left="c2ScreenX" :top="effect.control[3]" v-on:drag="handleDrag(1,$event)"/>
-    <svg xmlns="http://www.w3.org/2000/svg" class="bezier-line-container">
+    <svg xmlns="http://www.w3.org/2000/svg" class="bezier-line-container" :style="linesStyle">
       <line :x1="p1ScreenX" :y1="p1[1]*0.5" :x2="c1ScreenX" :y2="this.effect.control[1]" stroke="yellow"/>
       <line :x1="p2ScreenX" :y1="p2[1]*0.5" :x2="c2ScreenX" :y2="this.effect.control[3]" stroke="yellow"/>
     </svg>
@@ -29,6 +29,12 @@ export default {
         },
         p2ScreenX(){
           return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p2[0])/2;
+        },
+        linesStyle(){
+          return {
+            width:this.p2ScreenX + "px",
+            height:"250px"
+          };
         }
     },
     methods: {

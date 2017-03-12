@@ -104,17 +104,6 @@ export default {
                     this.$emit("offsetXChanged", offsetX);
                 }
             }
-            if (Math.abs(e.deltaY) >= 0.0) {
-                let scale = this.scale;
-                const lastScale = scale;
-                scale*= 1.0 + e.deltaY * 0.01;
-                if (this.scale !== scale && scale > 0.0001 && scale < 10) {
-                    const timeDelta = LayoutCalculator.screenXToTime(scale,this.offsetX,this.lastX)
-                    - LayoutCalculator.screenXToTime(lastScale,this.offsetX,this.lastX);
-                    this.$emit("offsetXChanged",this.offsetX - timeDelta * 2.0)
-                    this.$emit("scaleChanged", scale);
-                }
-            }
         },
         move(e){
           this.lastX = e.offsetX;
