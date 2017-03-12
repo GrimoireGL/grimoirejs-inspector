@@ -2,7 +2,8 @@
   <div>
   <div class="timebelt-root">
     <div class="property-header">
-      <p>Properties</p>
+      <p>clip:</p>
+      <Dropdown value="ABC" width="120"/>
     </div>
     <div class="timebelt-container">
       <canvas ref="timebelt" v-on:wheel.prevent="wheel" v-on:mousemove="move"/>
@@ -18,6 +19,7 @@
 import TimebeltDrawer from "../../animation/TimebeltDrawer";
 import TimeCursor from "./timeline-cursor.vue";
 import LayoutCalculator from "../../animation/LayoutCalculator";
+import Dropdown from "../common/dropdown.vue";
 export default {
     props: ["offsetX", "scale","timeViewHeight","currentTime"],
     data(){
@@ -60,7 +62,8 @@ export default {
       }
     },
     components: {
-        TimeCursor
+        TimeCursor,
+        Dropdown
     }
 }
 </script>
@@ -71,11 +74,16 @@ export default {
   height 24px
   display flex
   .property-header
+    display flex
     width 156px
     min-width 156px
     border-right solid 1px black
     z-index 100
     background-color black
+    p
+      display flex
+      align-items center
+      height 100%
   .timebelt-container
     flex 1
     position relative
