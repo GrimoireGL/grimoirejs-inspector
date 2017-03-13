@@ -8,7 +8,7 @@
     <div class="timebelt-container">
       <canvas ref="timebelt" v-on:wheel.prevent="wheel" v-on:mousemove="move"/>
       <div class="timebelt-cursor-container">
-        <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight" :offsetX="offsetX" :currentTime="currentTime" :scale="scale"/>
+        <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight" :offsetX="offsetX" :currentTime="currentTime" :scale="scale" v-on:currentTimeChanged="currentTimeChanged"/>
       </div>
     </div>
   </div>
@@ -59,6 +59,9 @@ export default {
       },
       move(e){
         this.lastX = e.offsetX;
+      },
+      currentTimeChanged(t){
+        this.$emit("currentTimeChanged",t);
       }
     },
     components: {

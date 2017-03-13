@@ -40,7 +40,7 @@ export default {
     methods: {
         handleDrag(i, e) {
             const effect = this.effect;
-            const nx = effect.control[2 * i] + LayoutCalculator.screenXToTime(this.scale, this.offsetX, e.movementX);
+            const nx = effect.control[2 * i] + LayoutCalculator.screenXToTime(this.scale, 0 , e.movementX);
             if(nx > this.p2[0] || nx < this.p1[0]){
               return;
             }

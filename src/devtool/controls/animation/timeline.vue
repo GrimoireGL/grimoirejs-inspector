@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="timeline-root">
-    <TimeBelt :offsetX="offsetX" :scale="scale" :timeViewHeight="timeViewHeight" currentTime="200"  v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged"/>
+    <TimeBelt :offsetX="offsetX" :scale="scale" :currentTime="currentTime" :timeViewHeight="timeViewHeight"  v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged" v-on:currentTimeChanged="currentTimeChanged"/>
     <div class="timeview-scroll-container">
       <div ref="timeviews" class="timeview-container">
         <Timeview :offsetX="offsetX" :scale="scale" v-on:offsetXChanged="offsetXChanged" v-on:scaleChanged="scaleChanged" v-on:expandChanged="expandChanged"/>
@@ -18,7 +18,8 @@ export default {
     return {
       offsetX:0,
       scale:1,
-      timeViewHeight:0
+      timeViewHeight:0,
+      currentTime:200
     };
   },
   components:{
@@ -34,6 +35,9 @@ export default {
     },
     expandChanged(){
       this.timeViewHeight = this.$refs.timeviews.clientHeight;
+    },
+    currentTimeChanged(t){
+      this.currentTime = t;
     }
   },
   mounted(){

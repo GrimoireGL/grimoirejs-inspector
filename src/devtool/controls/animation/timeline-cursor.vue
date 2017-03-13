@@ -1,6 +1,6 @@
 <template lang="html">
   <svg :style="{left:calcLeft}" class="current-frame-cursor" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-  	 :viewBox="calcViewBox" style="enable-background:new 0 0 5 79;" xml:space="preserve">
+  	 :viewBox="calcViewBox" style="enable-background:new 0 0 5 79;" xml:space="preserve" v-on:mousedown="down">
   <g>
   	<g>
   		<polygon class="st0" points="0,15.2 0,0.1 4.9,0.1 4.9,15.3 2.5,19.9"/>
@@ -14,6 +14,11 @@
 import LayoutCalculator from "../../animation/LayoutCalculator";
 export default {
   props:["lineHeight","offsetX","scale","currentTime"],
+  data(){
+    return {
+      drag:false
+    };
+  },
   computed:{
     calcY2(){
       return this.lineHeight + 19;
@@ -24,6 +29,24 @@ export default {
     calcLeft(){
       return (this.currentTime - this.offsetX) * this.scale;
     }
+  },
+  methods:{
+    down(){
+      this.drag = true;
+    }
+  },
+  mounted(){
+    document.addEventListener("mouseup",()=>{
+      this.drag = false;
+    });
+    document.addEventListener("mousemove",(e)=>{
+      if(!this.drag)return;
+      const diffTime = LayoutCalculator.screenXToTime(this.scale,0,e.movementX);
+      const time = diffTime + this.currentTime;
+      if(time >= 0){
+        this.$emit("currentTimeChanged",time);
+      }
+    });
   }
 }
 </script>

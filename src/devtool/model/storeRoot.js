@@ -79,6 +79,13 @@ const store = new vuex.Store({
           return null;
         }
         return state.currentNode.nodeId;
+      },
+      currentRootKey:function(state){
+        if(!state.tree){
+          return null;
+        }else{
+          return state.tree.key;
+        }
       }
     },
     actions:{

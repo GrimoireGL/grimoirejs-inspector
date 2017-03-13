@@ -47,6 +47,13 @@ MessageManager.on("attribute-change",function(m){
   AttributeWatcher.set(m.model);
 });
 
+MessageManager.response("query-nodes",function(m){
+  const gr = window.GrimoireJS;
+  const root = gr.rootNodes[m.rootKey];
+  const nodes = root.tree(m.query).nodes[0];
+  return nodes.map(n=>ObjectConverter.fromElement(n.element,true));
+});
+
 // register response handlers
 for(let message in Responses){
   MessageManager.response(message,Responses[message]);
