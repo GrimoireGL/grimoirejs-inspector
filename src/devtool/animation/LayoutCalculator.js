@@ -14,7 +14,7 @@ export default class LayoutCalculator {
         const t = firstLine + i * stride;
         yield {
           time: t,
-          screenX: LayoutCalculator.timeToScreenX(scale,offsetX,t),
+          screenX: LayoutCalculator.timeToScreenX(scale,offsetX,t,true),
           importance: LayoutCalculator.getImportance(scale,t)
         };
       }
@@ -42,14 +42,21 @@ export default class LayoutCalculator {
       return result;
     }
 
-    static timeToScreenX(scale,offsetX,time){
+    static timeToScreenX(scale,offsetX,time,isCanvas = false){
       const timeFromLeft = time - offsetX;
-      return scale * timeFromLeft * LayoutCalculator.gridScale;
+      const rawTime = scale * timeFromLeft * LayoutCalculator.gridScale;
+      return isCanvas ? rawTime : rawTime / 2;
     }
 
-    static screenXToTime(scale,offsetX,screenX){
+    static screenXToTime(scale,offsetX,screenX,isCanvas = false){
       const scaled = LayoutCalculator.timeToScreenX(scale,0,1);
-      return offsetX + screenX / scaled;
+      const rawScreenX = offsetX + screenX / scaled;
+      return isCanvas ? rawScreenX : rawScreenX * 2;
+    }
+
+    static movementXToTimeDelta(scale,movementX){
+      const timeScale = LayoutCalculator.screenXToTime(scale,0,movementX);
+      return movementX / 2.0;
     }
 
     static getImportance(scale, value) {

@@ -50,9 +50,9 @@ export default {
             const lastScale = scale;
             scale*= 1.0 + e.deltaY * 0.01;
             if (this.scale !== scale && scale > 0.0001 && scale < 10) {
-                const timeDelta = LayoutCalculator.screenXToTime(scale,this.offsetX,this.lastX)
-                - LayoutCalculator.screenXToTime(lastScale,this.offsetX,this.lastX);
-                this.$emit("offsetXChanged",this.offsetX - timeDelta * 2.0)
+                const timeDelta = LayoutCalculator.screenXToTime(scale,0,this.lastX)
+                - LayoutCalculator.screenXToTime(lastScale,0,this.lastX);
+                this.$emit("offsetXChanged",this.offsetX - timeDelta)
                 this.$emit("scaleChanged", scale);
             }
         }

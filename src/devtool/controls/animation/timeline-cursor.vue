@@ -41,7 +41,7 @@ export default {
     });
     document.addEventListener("mousemove",(e)=>{
       if(!this.drag)return;
-      const diffTime = LayoutCalculator.screenXToTime(this.scale,0,e.movementX);
+      const diffTime = LayoutCalculator.movementXToTimeDelta(this.scale,e.movementX);
       const time = diffTime + this.currentTime;
       if(time >= 0){
         this.$emit("currentTimeChanged",time);

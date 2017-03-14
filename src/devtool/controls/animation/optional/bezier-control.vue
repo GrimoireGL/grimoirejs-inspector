@@ -19,16 +19,16 @@ export default {
     props: ["effect", "p1", "p2", "scale", "offsetX"],
     computed: {
         c1ScreenX() {
-            return LayoutCalculator.timeToScreenX(this.scale, this.offsetX, this.effect.control[0])/2;
+            return LayoutCalculator.timeToScreenX(this.scale, this.offsetX, this.effect.control[0]);
         },
         c2ScreenX() {
-            return LayoutCalculator.timeToScreenX(this.scale, this.offsetX, this.effect.control[2])/2;
+            return LayoutCalculator.timeToScreenX(this.scale, this.offsetX, this.effect.control[2]);
         },
         p1ScreenX(){
-          return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p1[0])/2;
+          return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p1[0]);
         },
         p2ScreenX(){
-          return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p2[0])/2;
+          return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p2[0]);
         },
         linesStyle(){
           return {
@@ -40,12 +40,12 @@ export default {
     methods: {
         handleDrag(i, e) {
             const effect = this.effect;
-            const nx = effect.control[2 * i] + LayoutCalculator.screenXToTime(this.scale, 0 , e.movementX);
+            const nx = effect.control[2 * i] + LayoutCalculator.movementXToTimeDelta(this.scale, e.movementX);
             if(nx > this.p2[0] || nx < this.p1[0]){
               return;
             }
             effect.control.splice(2 * i, 1, nx);
-            effect.control.splice(2 * i + 1, 1, effect.control[2 * i + 1] + e.movementY);
+            effect.control.splice(2 * i + 1, 1, effect.control[2 * i + 1] + e.movementY/2.0);
             this.$emit("effectChanged", effect);
         }
     }

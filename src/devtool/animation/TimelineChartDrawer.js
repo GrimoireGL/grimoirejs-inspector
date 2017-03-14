@@ -70,7 +70,7 @@ export default class TimeLineChartDrawer {
             this.context.strokeStyle = this.labels[i].color;
             for (let j = 0; j < timeline.times.length; j++) {
                 const t = timeline.times[j];
-                const x = LayoutCalculator.timeToScreenX(this.scale, this.offsetX, t);
+                const x = LayoutCalculator.timeToScreenX(this.scale, this.offsetX, t,true);
                 if (j === 0) {
                     this.context.moveTo(x, timeline.values[j]);
                 } else {
@@ -78,7 +78,7 @@ export default class TimeLineChartDrawer {
                     if (!e || e.type === void 0 || e.type === "LINEAR") {
                         this.context.lineTo(x, timeline.values[j]);
                     } else {
-                      const x2 = LayoutCalculator.timeToScreenX(this.scale, this.offsetX, t);
+                      const x2 = LayoutCalculator.timeToScreenX(this.scale, this.offsetX, t,true);
                       TimeEffect.drawEffect(this.context,this.scale, this.offsetX, e, [x2, timeline.values[j - 1]], [x, timeline.values[j]]);
                     }
                 }

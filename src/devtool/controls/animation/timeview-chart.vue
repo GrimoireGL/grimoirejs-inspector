@@ -19,7 +19,7 @@ import LayoutCalculator from "../../animation/LayoutCalculator";
 import TimeEffect from "../../animation/TimeEffect";
 export default {
     components:{Point},
-    props: ["expand", "offsetX", "scale","model"],
+    props: ["expand", "offsetX","offsetY", "scale","model"],
     data(){
       return {
         lastX:0
@@ -36,7 +36,7 @@ export default {
               timeline:timeline,
               index:j,
               color:label.color,
-              left:LayoutCalculator.timeToScreenX(this.scale,this.offsetX,timeline.times[j]) / 2,
+              left:LayoutCalculator.timeToScreenX(this.scale,this.offsetX,timeline.times[j]),
               top: timeline.values[j] / 2
             })
           }
@@ -112,7 +112,7 @@ export default {
           return LayoutCalculator.timeToScreenX(t) + "px";
         },
         handleDrag(val,e){
-          const xdiff = LayoutCalculator.screenXToTime(this.scale,0,e.movementX);
+          const xdiff = LayoutCalculator.movementXToTimeDelta(this.scale,e.movementX);
           if(val.timeline.times[val.index] + xdiff < 0){
             return;
           }
