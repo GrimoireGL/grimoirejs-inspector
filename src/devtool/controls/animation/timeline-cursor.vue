@@ -12,8 +12,9 @@
 
 <script>
 import LayoutCalculator from "../../animation/LayoutCalculator";
+import {mapState,mapMutations} from "vuex";
 export default {
-  props:["lineHeight","offsetX","scale","currentTime"],
+  props:["lineHeight"],
   data(){
     return {
       drag:false
@@ -27,13 +28,15 @@ export default {
       return `0 0 5 ${this.calcY2 + 19}`;
     },
     calcLeft(){
-      return (this.currentTime - this.offsetX) * this.scale;
-    }
+      return (this.currentTime - this.offsetX) * this.scaleX;
+    },
+    ...mapState("animation",["offsetX","scaleX","currentTime"])
   },
   methods:{
     down(){
       this.drag = true;
-    }
+    },
+    ...mapMutations("animation",["setCurrentTime"])
   },
   mounted(){
     document.addEventListener("mouseup",()=>{
@@ -41,10 +44,10 @@ export default {
     });
     document.addEventListener("mousemove",(e)=>{
       if(!this.drag)return;
-      const diffTime = LayoutCalculator.movementXToTimeDelta(this.scale,e.movementX);
+      const diffTime = LayoutCalculator.movementXToTimeDelta(this.scaleX,e.movementX);
       const time = diffTime + this.currentTime;
       if(time >= 0){
-        this.$emit("currentTimeChanged",time);
+        this.setCurrentTime(time);
       }
     });
   }

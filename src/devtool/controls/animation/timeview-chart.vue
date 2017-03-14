@@ -6,7 +6,7 @@
           <Point :color="value.color" :left="value.left" :top="value.top" v-on:drag="handleDrag(value,$event)" size="4"/>
       </div>
       <div v-for="(value,index) in effects" class="effects">
-        <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetX="offsetX" :scale="scale" v-on:effectChanged="effectChanged(value,$event)"/>
+        <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetX="offsetX" :scale="scaleX" v-on:effectChanged="effectChanged(value,$event)"/>
       </div>
     </div>
   </div>
@@ -17,9 +17,10 @@ import TimeLineChartDrawer from "../../animation/TimeLineChartDrawer";
 import Point from "./timeline-point.vue";
 import LayoutCalculator from "../../animation/LayoutCalculator";
 import TimeEffect from "../../animation/TimeEffect";
+import {mapState,mapMutations} from "vuex";
 export default {
     components:{Point},
-    props: ["expand", "offsetX","offsetY", "scale","model"],
+    props: ["expand","model"],
     data(){
       return {
         lastX:0
@@ -36,7 +37,7 @@ export default {
               timeline:timeline,
               index:j,
               color:label.color,
-              left:LayoutCalculator.timeToScreenX(this.scale,this.offsetX,timeline.times[j]),
+              left:LayoutCalculator.timeToScreenX(this.scaleX,this.offsetX,timeline.times[j]),
               top: timeline.values[j] / 2
             })
           }
@@ -67,7 +68,8 @@ export default {
           }
         }
         return arr;
-      }
+      },
+      ...mapState("animation",["offsetX","offsetY","scaleX","scaleY"])
     },
     mounted() {
         this.chartDrawer = new TimeLineChartDrawer(this.$refs.chart, this.expand);
@@ -88,8 +90,8 @@ export default {
         }, {
             immediate: true
         });
-        this.$watch("scale", () => {
-            this.chartDrawer.scale = this.scale;
+        this.$watch("scaleX", () => {
+            this.chartDrawer.scale = this.scaleX;
             this.chartDrawer.onDraw();
         }, {
             immediate: true
@@ -99,9 +101,9 @@ export default {
     methods: {
         wheel(e) {
             if (Math.abs(e.deltaX) >= 0.0) {
-                const offsetX = Math.max(0, LayoutCalculator.screenXToTime(this.scale,0,e.deltaX) + this.offsetX);
+                const offsetX = Math.max(0, LayoutCalculator.screenXToTime(this.scaleX,0,e.deltaX) + this.offsetX);
                 if (offsetX !== this.offsetX) {
-                    this.$emit("offsetXChanged", offsetX);
+                    this.setOffsetX(offsetX);
                 }
             }
         },
@@ -112,7 +114,7 @@ export default {
           return LayoutCalculator.timeToScreenX(t) + "px";
         },
         handleDrag(val,e){
-          const xdiff = LayoutCalculator.movementXToTimeDelta(this.scale,e.movementX);
+          const xdiff = LayoutCalculator.movementXToTimeDelta(this.scaleX,e.movementX);
           if(val.timeline.times[val.index] + xdiff < 0){
             return;
           }
@@ -136,7 +138,8 @@ export default {
         effectChanged(v,e){
           v.timeline.effects.splice(v.index,1,e);
           this.chartDrawer.onDraw();
-        }
+        },
+        ...mapMutations("animation",["setOffsetX"])
     }
 }
 </script>

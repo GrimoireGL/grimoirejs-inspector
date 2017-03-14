@@ -8,7 +8,7 @@
     <div class="timebelt-container">
       <canvas ref="timebelt" v-on:wheel.prevent="wheel" v-on:mousemove="move"/>
       <div class="timebelt-cursor-container">
-        <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight" :offsetX="offsetX" :currentTime="currentTime" :scale="scale" v-on:currentTimeChanged="currentTimeChanged"/>
+        <TimeCursor :length="timeViewHeight" :lineHeight="timeViewHeight"/>
       </div>
     </div>
   </div>
@@ -20,8 +20,9 @@ import TimebeltDrawer from "../../animation/TimebeltDrawer";
 import TimeCursor from "./timeline-cursor.vue";
 import LayoutCalculator from "../../animation/LayoutCalculator";
 import Dropdown from "../common/dropdown.vue";
+import {mapState,mapMutations} from "vuex";
 export default {
-    props: ["offsetX", "scale","timeViewHeight","currentTime"],
+    props: ["timeViewHeight"],
     data(){
       return {
         lastX:0
@@ -35,8 +36,8 @@ export default {
         }, {
             immediate: true
         });
-        this.$watch("scale", () => {
-            this.beltDrawer.scale = this.scale;
+        this.$watch("scaleX", () => {
+            this.beltDrawer.scale = this.scaleX;
             this.beltDrawer.onDraw();
         }, {
             immediate: true
@@ -46,23 +47,24 @@ export default {
     methods:{
       wheel(e){
         if (Math.abs(e.deltaY) >= 0.0) {
-            let scale = this.scale;
+            let scale = this.scaleX;
             const lastScale = scale;
             scale*= 1.0 + e.deltaY * 0.01;
-            if (this.scale !== scale && scale > 0.0001 && scale < 10) {
+            if (this.scaleX !== scale && scale > 0.0001 && scale < 10) {
                 const timeDelta = LayoutCalculator.screenXToTime(scale,0,this.lastX)
                 - LayoutCalculator.screenXToTime(lastScale,0,this.lastX);
-                this.$emit("offsetXChanged",this.offsetX - timeDelta)
-                this.$emit("scaleChanged", scale);
+                this.setOffsetX(this.offsetX - timeDelta / 2.0)
+                this.setScaleX(scale);
             }
         }
       },
       move(e){
         this.lastX = e.offsetX;
       },
-      currentTimeChanged(t){
-        this.$emit("currentTimeChanged",t);
-      }
+      ...mapMutations("animation",["setScaleX","setOffsetX"])
+    },
+    computed:{
+      ...mapState("animation",["scaleX","offsetX","currentTime"])
     },
     components: {
         TimeCursor,

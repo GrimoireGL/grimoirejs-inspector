@@ -12,35 +12,37 @@
 <script>
 import Point from "../timeline-point.vue";
 import LayoutCalculator from "../../../animation/LayoutCalculator";
+import {mapState} from "vuex";
 export default {
     components: {
         Point
     },
-    props: ["effect", "p1", "p2", "scale", "offsetX"],
+    props: ["effect", "p1", "p2"],
     computed: {
         c1ScreenX() {
-            return LayoutCalculator.timeToScreenX(this.scale, this.offsetX, this.effect.control[0]);
+            return LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, this.effect.control[0]);
         },
         c2ScreenX() {
-            return LayoutCalculator.timeToScreenX(this.scale, this.offsetX, this.effect.control[2]);
+            return LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, this.effect.control[2]);
         },
         p1ScreenX(){
-          return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p1[0]);
+          return LayoutCalculator.timeToScreenX(this.scaleX,this.offsetX,this.p1[0]);
         },
         p2ScreenX(){
-          return LayoutCalculator.timeToScreenX(this.scale,this.offsetX,this.p2[0]);
+          return LayoutCalculator.timeToScreenX(this.scaleX,this.offsetX,this.p2[0]);
         },
         linesStyle(){
           return {
             width:this.p2ScreenX + "px",
             height:"250px"
           };
-        }
+        },
+        ...mapState("animation",["scaleX","scaleY","offsetX","offsetY"])
     },
     methods: {
         handleDrag(i, e) {
             const effect = this.effect;
-            const nx = effect.control[2 * i] + LayoutCalculator.movementXToTimeDelta(this.scale, e.movementX);
+            const nx = effect.control[2 * i] + LayoutCalculator.movementXToTimeDelta(this.scaleX, e.movementX);
             if(nx > this.p2[0] || nx < this.p1[0]){
               return;
             }

@@ -51,7 +51,7 @@ export default {
       if(this.mousehold){
         this.$emit("drag",e);
       }
-    })
+    });
   }
 }
 </script>
