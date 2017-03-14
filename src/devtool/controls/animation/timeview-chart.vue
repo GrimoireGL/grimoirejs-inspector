@@ -1,12 +1,12 @@
 <template lang="html">
   <div class="timeview-chart-root">
-    <canvas ref="chart" v-on:wheel.prevent="wheel" v-on:mousemove="move"/>
+    <canvas ref="chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
           <Point :color="value.color" :left="value.left" :top="value.top" v-on:drag="handleDrag(value,$event)" size="4"/>
       </div>
       <div v-for="(value,index) in effects" class="effects">
-        <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetX="offsetX" :scale="scaleX" v-on:effectChanged="effectChanged(value,$event)"/>
+        <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetY="offsetY" :scaleY="scaleY" v-on:effectChanged="effectChanged(value,$event)"/>
       </div>
     </div>
   </div>
@@ -20,10 +20,12 @@ import TimeEffect from "../../animation/TimeEffect";
 import {mapState,mapMutations} from "vuex";
 export default {
     components:{Point},
-    props: ["expand","model"],
+    props: ["expand","model","offsetY","scaleY"],
     data(){
       return {
-        lastX:0
+        lastX:0,
+        lastY:0,
+        drag:false
       }
     },
     computed:{
@@ -38,7 +40,7 @@ export default {
               index:j,
               color:label.color,
               left:LayoutCalculator.timeToScreenX(this.scaleX,this.offsetX,timeline.times[j]),
-              top: timeline.values[j] / 2
+              top: LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,timeline.values[j])
             })
           }
         }
@@ -69,9 +71,20 @@ export default {
         }
         return arr;
       },
-      ...mapState("animation",["offsetX","offsetY","scaleX","scaleY"])
+      ...mapState("animation",["offsetX","scaleX"])
     },
     mounted() {
+        document.addEventListener("mouseup",(e)=>{
+          this.drag = false;
+        });
+        document.addEventListener("mousemove",(e)=>{
+          if(this.drag){
+            const nx = this.offsetX - LayoutCalculator.movementXToTimeDelta(this.scaleX,e.movementX);
+            this.setOffsetX(Math.max(0,nx));
+            const ny = this.offsetY - LayoutCalculator.movementYToValueDelta(this.scaleY,e.movementY);
+            this.$emit("offsetYChanged",ny);
+          }
+        });
         this.chartDrawer = new TimeLineChartDrawer(this.$refs.chart, this.expand);
         this.chartDrawer.timelines = this.model.timelines;
         this.chartDrawer.labels = this.model.labels;
@@ -91,7 +104,19 @@ export default {
             immediate: true
         });
         this.$watch("scaleX", () => {
-            this.chartDrawer.scale = this.scaleX;
+            this.chartDrawer.scaleX = this.scaleX;
+            this.chartDrawer.onDraw();
+        }, {
+            immediate: true
+        });
+        this.$watch("offsetY", () => {
+            this.chartDrawer.offsetY = this.offsetY;
+            this.chartDrawer.onDraw();
+        }, {
+            immediate: true
+        });
+        this.$watch("scaleY", () => {
+            this.chartDrawer.scaleY = this.scaleY;
             this.chartDrawer.onDraw();
         }, {
             immediate: true
@@ -106,9 +131,19 @@ export default {
                     this.setOffsetX(offsetX);
                 }
             }
+            if(Math.abs(e.deltaY) >= 0.0){
+              const offsetY = LayoutCalculator.movementYToValueDelta(this.scaleY,-e.deltaY) + this.offsetY;
+              if(offsetY !== this.offsetY){
+                this.$emit("offsetYChanged",offsetY);
+              }
+            }
         },
         move(e){
           this.lastX = e.offsetX;
+          this.lastY = e.offsetY;
+        },
+        down(e){
+          this.drag = true;
         },
         calcDisplayPx(t){
           return LayoutCalculator.timeToScreenX(t) + "px";
@@ -132,7 +167,7 @@ export default {
             }
           }
           val.timeline.times.splice(val.index,1,val.timeline.times[val.index] + xdiff);
-          val.timeline.values.splice(val.index,1,val.timeline.values[val.index] + e.movementY);
+          val.timeline.values.splice(val.index,1,val.timeline.values[val.index] - e.movementY);
           this.chartDrawer.onDraw();
         },
         effectChanged(v,e){

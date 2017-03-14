@@ -3,8 +3,8 @@
     <TimeBelt :timeViewHeight="timeViewHeight"/>
     <div class="timeview-scroll-container">
       <div ref="timeviews" class="timeview-container">
-        <Timeview :offsetX="offsetX" :offsetY="offsetY" :scale="scaleX"/>
-        <Timeview :offsetX="offsetX" :offsetY="offsetY" :scale="scaleX"/>
+        <Timeview  v-on:expandChanged="expandChanged"/>
+        <Timeview v-on:expandChanged="expandChanged"/>
       </div>
     </div>
   </div>

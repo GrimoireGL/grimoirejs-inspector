@@ -2,6 +2,8 @@ export default class LayoutCalculator {
 
     static gridScale = 2.0;
 
+    static expandHeight = 200;
+
     static getStride(scale) {
         const basement = Math.floor(Math.log10(scale));;
         return Math.pow(10, -basement + 1.0);
@@ -48,15 +50,34 @@ export default class LayoutCalculator {
       return isCanvas ? rawTime : rawTime / 2;
     }
 
+    static valueToScreenY(scale,offsetY,value,isCanvas = false){
+      const valueFromMiddle = value - offsetY;
+      const height =  LayoutCalculator.expandHeight;
+      const raw = height - scale * valueFromMiddle * LayoutCalculator.gridScale;
+      return isCanvas ? raw : raw / 2.0;
+    }
+
     static screenXToTime(scale,offsetX,screenX,isCanvas = false){
       const scaled = LayoutCalculator.timeToScreenX(scale,0,1);
       const rawScreenX = offsetX + screenX / scaled;
       return isCanvas ? rawScreenX : rawScreenX * 2;
     }
 
+    static screenYToValue(scale,offsetY,screenY,isCanvas = false){
+      const scaled = LayoutCalculator.valueToScreenY(scale,0,1);
+      const height =  LayoutCalculator.expandHeight * (isCanvas ? 1: 0.5);
+      const rawScreenX = offsetY + (height - screenY) / scaled;
+      return isCanvas ? rawScreenX : rawScreenX * 2;
+    }
+
     static movementXToTimeDelta(scale,movementX){
       const timeScale = LayoutCalculator.screenXToTime(scale,0,movementX);
-      return movementX / 2.0;
+      return movementX * timeScale / 2.0;
+    }
+
+    static movementYToValueDelta(scale,y){
+      const delta = scale * y * LayoutCalculator.gridScale;
+      return delta / 2.0;
     }
 
     static getImportance(scale, value) {

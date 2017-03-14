@@ -2,7 +2,7 @@
   <div :class="{'time-view-root':true,'expand':open}">
     <Expander v-model="open"/>
     <TimeViewLabel :model="model" :open="open"/>
-    <Chart :expand="open" :model="model"/>
+    <Chart :expand="open" :model="model" :offsetY="offsetY" :scaleY="scaleY" @offsetYChanged="offsetYChanged" @scaleYChanged="scaleYChanged"/>
   </div>
 </template>
 
@@ -57,11 +57,10 @@ export default {
             effects:[{type:"LINEAR"},{},{}]
           }
         ]
-      }
+      },
+      offsetY:0,
+      scaleY:1
     };
-  },
-  computed:{
-    ...mapState("animation",["scaleX","scaleY","offsetX","offsetY"])
   },
   components:{
     Expander,
@@ -72,6 +71,14 @@ export default {
     this.$watch("open",function(){
       this.$emit("expandChanged");
     })
+  },
+  methods:{
+    offsetYChanged(v){
+      this.offsetY = v;
+    },
+    scaleYChanged(v){
+      this.scaleY = v;
+    }
   }
 }
 </script>

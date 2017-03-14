@@ -43,13 +43,22 @@ export default class TimeLineChartDrawer {
         this.context.stroke();
     }
 
+    _drawHorizontal(y,width = 1, color = "white"){
+      this.context.beginPath();
+      this.context.moveTo(0, y);
+      this.context.lineTo(this.canvas.width,y);
+      this.context.lineWidth = width;
+      this.context.strokeStyle = color;
+      this.context.stroke();
+    }
+
     _drawGrid() {
-        if (this.offsetX === void 0 || this.scale === void 0) {
+        if (this.offsetX === void 0 || this.scaleX === void 0) {
             return;
         }
-        let stride = LayoutCalculator.getStride(this.scale);
+        let stride = LayoutCalculator.getStride(this.scaleX);
         let lastX = stride - (this.offsetX % stride);
-        for (let grid of LayoutCalculator.gridEnumrator(this.scale, this.offsetX)) {
+        for (let grid of LayoutCalculator.gridEnumrator(this.scaleX, this.offsetX)) {
             if (grid.screenX > this.canvas.width) {
                 break;
             }
@@ -57,6 +66,7 @@ export default class TimeLineChartDrawer {
             const style = LayoutCalculator.getStyleByImportance(grid.importance);
             this._drawVertical(grid.screenX, width, style);
         }
+        this._drawHorizontal(LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,0,true));;
     }
 
     _drawChart() {
@@ -70,16 +80,18 @@ export default class TimeLineChartDrawer {
             this.context.strokeStyle = this.labels[i].color;
             for (let j = 0; j < timeline.times.length; j++) {
                 const t = timeline.times[j];
-                const x = LayoutCalculator.timeToScreenX(this.scale, this.offsetX, t,true);
+                const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, t,true);
+                const y = LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,timeline.values[j],true);
                 if (j === 0) {
-                    this.context.moveTo(x, timeline.values[j]);
+                    this.context.moveTo(x, y);
                 } else {
                     const e = timeline.effects[j - 1];
                     if (!e || e.type === void 0 || e.type === "LINEAR") {
-                        this.context.lineTo(x, timeline.values[j]);
+                        this.context.lineTo(x, y);
                     } else {
-                      const x2 = LayoutCalculator.timeToScreenX(this.scale, this.offsetX, t,true);
-                      TimeEffect.drawEffect(this.context,this.scale, this.offsetX, e, [x2, timeline.values[j - 1]], [x, timeline.values[j]]);
+                      const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, t,true);
+                      const y2 = LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,timeline.values[j-1],true);
+                      TimeEffect.drawEffect(this.context,this.scaleX, this.offsetX, e, [x2, y2],[x, y]);
                     }
                 }
             }
