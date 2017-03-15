@@ -9,7 +9,7 @@ export default class LayoutCalculator {
         return Math.pow(10, -basement + 1.0);
     }
 
-    static *gridEnumrator(scale,offsetX){
+    static *columnEnumrator(scale,offsetX){
       const stride = this.getStride(scale);
       const firstLine = offsetX - (offsetX % stride);
       for(let i = 0;; i++){
@@ -22,6 +22,24 @@ export default class LayoutCalculator {
       }
     }
 
+    static *rowEnumrator(scale,offsetY){
+      const stride = this.getStride(scale);
+      const vHeight = LayoutCalculator.toValueScale(scale,LayoutCalculator.expandHeight);
+      const below = offsetY - vHeight;
+      const firstLine = Math.floor(below/stride) * stride;
+      for(let i = 0;; i++){
+        const t = firstLine + i * stride;
+        if(t > offsetY + vHeight){
+          break;
+        }else{
+          yield {
+            value:t,
+            screenY: LayoutCalculator.valueToScreenY(scale,offsetY,t,true),
+            importance: LayoutCalculator.getImportance(scale,t)
+          };
+        }
+      }
+    }
 
     static toTimeLabel(scale,time){
       const stride = LayoutCalculator.getStride(scale);
@@ -70,13 +88,17 @@ export default class LayoutCalculator {
       return isCanvas ? rawScreenX : rawScreenX * 2;
     }
 
+    static toValueScale(scale,screenY){
+      return scale * screenY * LayoutCalculator.gridScale;
+    }
+
     static movementXToTimeDelta(scale,movementX){
-      const timeScale = LayoutCalculator.screenXToTime(scale,0,movementX);
-      return movementX * timeScale / 2.0;
+      const timeScale = LayoutCalculator.screenXToTime(scale,0,movementX,true);
+      return timeScale / 2.0;
     }
 
     static movementYToValueDelta(scale,y){
-      const delta = scale * y * LayoutCalculator.gridScale;
+      const delta = scale * y * LayoutCalculator.gridScale/2.0;
       return delta / 2.0;
     }
 
@@ -102,15 +124,26 @@ export default class LayoutCalculator {
         }
     }
 
-    static getStyleByImportance(importance) {
+    static getStyleByImportance(importance,row) {
+      if(row){
         switch (importance) {
             case 0:
-                return "white";
+                return "#333";
             case 1:
-                return "white";
+                return "#444";
+            case 2:
+                return "#888";
+        }
+      }else{
+        switch (importance) {
+            case 0:
+                return "#333";
+            case 1:
+                return "#444";
             case 2:
                 return "orange";
         }
+      }
     }
 
     static getHeightByImportance(importance) {

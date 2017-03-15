@@ -46,7 +46,7 @@ export default class TimebeltDrawer {
         if (this.offsetX === void 0 || this.scale === void 0) {
             return;
         }
-        for(let grid of LayoutCalculator.gridEnumrator(this.scale,this.offsetX)){
+        for(let grid of LayoutCalculator.columnEnumrator(this.scale,this.offsetX)){
             if (grid.screenX > this.canvas.width) {
                 break;
             }

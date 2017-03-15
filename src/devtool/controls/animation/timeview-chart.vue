@@ -1,9 +1,9 @@
 <template lang="html">
   <div class="timeview-chart-root">
-    <canvas ref="chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down"/>
+    <canvas ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
-          <Point :color="value.color" :left="value.left" :top="value.top" v-on:drag="handleDrag(value,$event)" size="4"/>
+          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" v-on:drag="handleDrag(value,$event)" size="4"/>
       </div>
       <div v-for="(value,index) in effects" class="effects">
         <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetY="offsetY" :scaleY="scaleY" v-on:effectChanged="effectChanged(value,$event)"/>
@@ -40,7 +40,8 @@ export default {
               index:j,
               color:label.color,
               left:LayoutCalculator.timeToScreenX(this.scaleX,this.offsetX,timeline.times[j]),
-              top: LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,timeline.values[j])
+              top: LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,timeline.values[j]),
+              value:timeline.values[j]
             })
           }
         }
@@ -81,7 +82,7 @@ export default {
           if(this.drag){
             const nx = this.offsetX - LayoutCalculator.movementXToTimeDelta(this.scaleX,e.movementX);
             this.setOffsetX(Math.max(0,nx));
-            const ny = this.offsetY - LayoutCalculator.movementYToValueDelta(this.scaleY,e.movementY);
+            const ny = this.offsetY + LayoutCalculator.movementYToValueDelta(this.scaleY,e.movementY);
             this.$emit("offsetYChanged",ny);
           }
         });
@@ -153,6 +154,7 @@ export default {
           if(val.timeline.times[val.index] + xdiff < 0){
             return;
           }
+          // Check the point is between the last point and next one.
           if(e.movementX > 0){
             if(val.index + 1 < val.timeline.times.length){
               if(val.timeline.times[val.index] + xdiff >= val.timeline.times[val.index + 1]){
@@ -166,8 +168,9 @@ export default {
               }
             }
           }
+          const ydiff = LayoutCalculator.movementYToValueDelta(this.scaleY,e.movementY);
           val.timeline.times.splice(val.index,1,val.timeline.times[val.index] + xdiff);
-          val.timeline.values.splice(val.index,1,val.timeline.values[val.index] - e.movementY);
+          val.timeline.values.splice(val.index,1,val.timeline.values[val.index] - ydiff);
           this.chartDrawer.onDraw();
         },
         effectChanged(v,e){
@@ -188,6 +191,7 @@ export default {
     flex 1
     canvas
       user-select none
+      background-color #222
   .timeview-chart-points
     position absolute
     top 0px

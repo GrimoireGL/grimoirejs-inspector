@@ -43,7 +43,7 @@ export default class TimeLineChartDrawer {
         this.context.stroke();
     }
 
-    _drawHorizontal(y,width = 1, color = "white"){
+    _drawHorizontal(y,width = 1, color = "#333"){
       this.context.beginPath();
       this.context.moveTo(0, y);
       this.context.lineTo(this.canvas.width,y);
@@ -52,13 +52,19 @@ export default class TimeLineChartDrawer {
       this.context.stroke();
     }
 
+    _drawText(text,y,height = 10,style = "white"){
+      this.context.fillStyle = style;
+      this.context.fillText(text,3,y - 2);
+    }
+
+
     _drawGrid() {
-        if (this.offsetX === void 0 || this.scaleX === void 0) {
+        if (this.offsetX === void 0 || this.scaleX === void 0 || this.scaleY === void 0 || this.offsetY === void 0) {
             return;
         }
         let stride = LayoutCalculator.getStride(this.scaleX);
         let lastX = stride - (this.offsetX % stride);
-        for (let grid of LayoutCalculator.gridEnumrator(this.scaleX, this.offsetX)) {
+        for (let grid of LayoutCalculator.columnEnumrator(this.scaleX, this.offsetX)) {
             if (grid.screenX > this.canvas.width) {
                 break;
             }
@@ -66,7 +72,12 @@ export default class TimeLineChartDrawer {
             const style = LayoutCalculator.getStyleByImportance(grid.importance);
             this._drawVertical(grid.screenX, width, style);
         }
-        this._drawHorizontal(LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,0,true));;
+        for(let row of LayoutCalculator.rowEnumrator(this.scaleY,this.offsetY)){
+          const importance = row.importance;
+          this._drawHorizontal(row.screenY,LayoutCalculator.getWidthByImportance(importance),LayoutCalculator.getStyleByImportance(importance,true));
+          if(importance === 2)
+            this._drawText(row.value,row.screenY);
+        }
     }
 
     _drawChart() {
@@ -91,7 +102,7 @@ export default class TimeLineChartDrawer {
                     } else {
                       const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, t,true);
                       const y2 = LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,timeline.values[j-1],true);
-                      TimeEffect.drawEffect(this.context,this.scaleX, this.offsetX, e, [x2, y2],[x, y]);
+                      TimeEffect.drawEffect(this.context,this.scaleX,this.scaleY, this.offsetX,this.offsetY, e, [x2, y2],[x, y]);
                     }
                 }
             }

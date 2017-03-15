@@ -1,7 +1,7 @@
 <template lang="html">
   <div class="bezier-controls">
-    <Point color="yellow" size="2" :left="c1ScreenX" :top="effect.control[1]" v-on:drag="handleDrag(0,$event)"/>
-    <Point color="yellow" size="2" :left="c2ScreenX" :top="effect.control[3]" v-on:drag="handleDrag(1,$event)"/>
+    <Point color="yellow" size="2" :left="c1ScreenX" :top="c1ScreenY" v-on:drag="handleDrag(0,$event)"/>
+    <Point color="yellow" size="2" :left="c2ScreenX" :top="c2ScreenY" v-on:drag="handleDrag(1,$event)"/>
     <svg xmlns="http://www.w3.org/2000/svg" class="bezier-line-container" :style="linesStyle">
       <line :x1="p1ScreenX" :y1="p1ScreenY" :x2="c1ScreenX" :y2="c1ScreenY" stroke="yellow"/>
       <line :x1="p2ScreenX" :y1="p2ScreenY" :x2="c2ScreenX" :y2="c2ScreenY" stroke="yellow"/>
@@ -58,8 +58,9 @@ export default {
             if(nx > this.p2[0] || nx < this.p1[0]){
               return;
             }
+            const ydiff = LayoutCalculator.movementYToValueDelta(this.scaleY,e.movementY);
             effect.control.splice(2 * i, 1, nx);
-            effect.control.splice(2 * i + 1, 1, effect.control[2 * i + 1] + e.movementY/2.0);
+            effect.control.splice(2 * i + 1, 1, effect.control[2 * i + 1] - ydiff);
             this.$emit("effectChanged", effect);
         }
     }

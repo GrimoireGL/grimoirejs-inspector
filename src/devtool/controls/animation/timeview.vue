@@ -28,7 +28,7 @@ export default {
           },
           {
             name:"Z",
-            color:"#0F0F8E"
+            color:"#0F0F9E"
           },
           {
             name:"W",
@@ -88,7 +88,7 @@ export default {
     display flex
     height 15px
     background-color dimgray
-    border-bottom solid 1px black
+    border-bottom solid 2px white
     &.expand
       height 200px
 </style>
