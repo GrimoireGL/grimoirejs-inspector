@@ -78,6 +78,8 @@ export default {
   width 100%
   height 24px
   display flex
+  canvas
+    user-select none
   .property-header
     display flex
     width 156px

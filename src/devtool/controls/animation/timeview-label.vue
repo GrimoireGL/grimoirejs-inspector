@@ -28,6 +28,8 @@ export default {
     border-right solid 1px black
     background-color dimgray
     z-index 100
+    p
+      user-select none
     .timeview-labels-container
       display flex
       flex 1

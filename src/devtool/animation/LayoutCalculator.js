@@ -25,16 +25,17 @@ export default class LayoutCalculator {
     static *rowEnumrator(scale,offsetY){
       const stride = this.getStride(scale);
       const vHeight = LayoutCalculator.toValueScale(scale,LayoutCalculator.expandHeight);
-      const below = offsetY - vHeight;
+      const below = offsetY - vHeight * 2;
       const firstLine = Math.floor(below/stride) * stride;
       for(let i = 0;; i++){
         const t = firstLine + i * stride;
-        if(t > offsetY + vHeight){
+        const scY = LayoutCalculator.valueToScreenY(scale,offsetY,t,true);
+        if(scY <  0){
           break;
         }else{
           yield {
             value:t,
-            screenY: LayoutCalculator.valueToScreenY(scale,offsetY,t,true),
+            screenY: scY,
             importance: LayoutCalculator.getImportance(scale,t)
           };
         }
@@ -89,7 +90,7 @@ export default class LayoutCalculator {
     }
 
     static toValueScale(scale,screenY){
-      return scale * screenY * LayoutCalculator.gridScale;
+      return screenY / scale / LayoutCalculator.gridScale;
     }
 
     static movementXToTimeDelta(scale,movementX){
@@ -98,7 +99,7 @@ export default class LayoutCalculator {
     }
 
     static movementYToValueDelta(scale,y){
-      const delta = scale * y * LayoutCalculator.gridScale/2.0;
+      const delta =  y /scale * LayoutCalculator.gridScale/2.0;
       return delta / 2.0;
     }
 
