@@ -20,7 +20,27 @@ export default class Bezier{
     context.bezierCurveTo(cx1,cy1,cx2,cy2,next[0],next[1]);
   }
 
-  getValue(args,t){
-    return 0;
+  getValue(args,x){
+    let t = 0.5;
+    let nextDiff = 0.25;
+    let actX = (args.next[0] - args.current[0]) * x + args.current[0];
+    for(let i = 0; i < 500; i ++){
+      const c = this.getBezierValue(t,args.current[0],args.effect.control[0],args.effect.control[2],args.next[0]);
+      if(Math.abs(c - actX) < 0.001){
+        break;
+      }
+      if(c < actX){
+        t += nextDiff;
+      }else{
+        t -= nextDiff;
+      }
+      nextDiff /= 2;
+    }
+    return this.getBezierValue(t,args.current[1],args.effect.control[1],args.effect.control[3],args.next[1]);
+  }
+
+  getBezierValue(t,p1,p2,p3,p4){
+    const it = 1 - t;
+    return Math.pow(it,3) * p1 +  3 * Math.pow(it,2) * t * p2 + 3 * it * Math.pow(t,2) * p3 + Math.pow(t,3) * p4;
   }
 }

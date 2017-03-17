@@ -1,6 +1,6 @@
-<template lang="html">
+\<template lang="html">
   <div class="timeview-chart-root">
-    <canvas ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down"/>
+    <canvas :style="canvasStyle" ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down" v-on:click="click"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
           <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" v-on:drag="handleDrag(value,$event)" size="4"/>
@@ -30,10 +30,18 @@ export default {
         return {
             lastX: 0,
             lastY: 0,
-            drag: false
+            drag: false,
+            onChartLine:false
         }
     },
     computed: {
+        canvasStyle(){
+          return {
+            cursor:(this.onChartLine ? "pointer" : "default"),
+            width:"300px",
+            height:"400px"
+          };
+        },
         points() {
             const arr = [];
             for (let i = 0; i < this.model.labels.length; i++) {
@@ -97,6 +105,9 @@ export default {
         this.chartDrawer = new TimeLineChartDrawer(this.$refs.chart, this.expand);
         this.chartDrawer.timelines = this.model.timelines;
         this.chartDrawer.labels = this.model.labels;
+        this.chartDrawer.cursorHandler = (overCursor)=>{
+          this.onChartLine = overCursor;
+        };
         this.$watch("model", () => {
             this.chartDrawer.timelines = this.model.timelines;
             this.chartDrawer.labels = this.model.labels;
@@ -198,6 +209,9 @@ export default {
         effectChanged(v, e) {
             v.timeline.effects.splice(v.index, 1, e);
             this.chartDrawer.onDraw();
+        },
+        click(e){
+          this.chartDrawer.onClick();
         },
         ...mapMutations("animation", ["setOffsetX"])
     }

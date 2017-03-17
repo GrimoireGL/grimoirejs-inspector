@@ -32,6 +32,14 @@ export default class TimeLineChartDrawer {
         }
     }
 
+    onClick() {
+      const x = this.mouse[0];
+      const y = this.mouse[1];
+      const result = this._hitTest(x, y);
+      this.selected = result ? [result.timelineIndex,result.index] : null;
+      this.onDraw();
+    }
+
     _clear() {
         this.context.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
@@ -121,11 +129,41 @@ export default class TimeLineChartDrawer {
             }
             this.context.stroke();
         }
+        // Draw highlighted lines
+        if(this.selected){
+          const timeline = this.timelines[this.selected[0]];
+          this.context.beginPath();
+          this.context.lineWidth = 6;
+          this.context.strokeStyle = this.labels[this.selected[0]].color;
+          const currentIndex = this.selected[1];
+          const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex], true);
+          const y = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex], true);
+          this.context.moveTo(x,y);
+          const e = timeline.effects[currentIndex];
+          let type;
+          if (!e || e.type === void 0 || e.type === "LINEAR") {
+              type = "LINEAR"
+          } else {
+              type = e.type;
+          }
+          const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex + 1], true);
+          const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex + 1], true);
+          Effects[type].drawEffect({
+              context: this.context,
+              scaleX: this.scaleX,
+              scaleY: this.scaleY,
+              offsetX: this.offsetX,
+              offsetY: this.offsetY,
+              effect: e,
+              current: [x, y],
+              next: [x2, y2]
+          });
+          this.context.stroke();
+        }
     }
 
-    _drawPointer() {
-        const x = this.mouse[0];
-        const y = this.mouse[1];
+    // check specified x,y pair intersects some of chart line
+    _hitTest(x, y) {
         const t = LayoutCalculator.screenXToTime(this.scaleX, this.offsetX, x, true);
         for (let i = 0; i < this.timelines.length; i++) {
             const timeline = this.timelines[i];
@@ -146,15 +184,34 @@ export default class TimeLineChartDrawer {
                     const sy = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, ey, true);
                     const sx = x * 2;
                     if (Math.abs(y * 2 - sy) < 5.0) {
-                        this.context.beginPath();
-                        this.context.arc(sx, sy, 5, 0, 2 * Math.PI, false);
-                        this.context.fillStyle = 'green';
-                        this.context.fill();
-                        this.context.strokeStyle = 'black';
-                        this.context.stroke();
-                        return;
+                        return {
+                            timeline: timeline,
+                            timelineIndex:i,
+                            index: j,
+                            screenX: sx,
+                            screenY: sy
+                        };
                     }
                 }
+            }
+        }
+        return null;
+    }
+
+    _drawPointer() {
+        const x = this.mouse[0];
+        const y = this.mouse[1];
+        const result = this._hitTest(x, y);
+        if (this.cursorHandler) {
+            this.cursorHandler(!!result);
+            if (result) {
+                this.context.beginPath();
+                this.context.arc(result.screenX, result.screenY, 5, 0, 2 * Math.PI, false);
+                this.context.fillStyle = 'white';
+                this.context.fill();
+                this.context.lineWidth = 2;
+                this.context.strokeStyle = 'black';
+                this.context.stroke();
             }
         }
     }

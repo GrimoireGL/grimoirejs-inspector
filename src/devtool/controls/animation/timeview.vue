@@ -28,7 +28,7 @@ export default {
           },
           {
             name:"Z",
-            color:"#0F0F9E"
+            color:"#0F0FBE"
           },
           {
             name:"W",
