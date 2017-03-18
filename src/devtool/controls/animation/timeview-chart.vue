@@ -5,9 +5,7 @@
       <div v-for="(value,index) in points">
           <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" v-on:drag="handleDrag(value,$event)" size="4"/>
       </div>
-      <div v-for="(value,index) in effects" class="effects">
-        <components :is="value.control" :effect="value.effect" :p1="value.p1" :p2="value.p2" :offsetY="offsetY" :scaleY="scaleY" v-on:effectChanged="effectChanged(value,$event)"/>
-      </div>
+      <components v-if="selection" :is="selection.control" :effect="selection.effect" :p1="selection.p1" :p2="selection.p2" :offsetY="offsetY" :scaleY="scaleY" v-on:effectChanged="effectChanged(selection,$event)"/>
     </div>
   </div>
 </template>
@@ -31,7 +29,9 @@ export default {
             lastX: 0,
             lastY: 0,
             drag: false,
-            onChartLine:false
+            onChartLine:false,
+            selectedTimelineIndex:-1,
+            selectedLineIndex:-1
         }
     },
     computed: {
@@ -59,6 +59,31 @@ export default {
                 }
             }
             return arr;
+        },
+        selection(){
+          if(this.selectedTimelineIndex >= 0 && this.selectedLineIndex >= 0){
+            const timeline = this.model.timelines[this.selectedTimelineIndex];
+            const effect = timeline.effects[this.selectedLineIndex];
+            if(!effect || !effect.type){
+              return null;
+            }
+            const effectControl = Effects[effect.type].optionalControl;
+            if (effectControl === null) {
+                return null;
+            }
+            const p1 = [timeline.times[this.selectedLineIndex], timeline.values[this.selectedLineIndex]];
+            const p2 = [timeline.times[this.selectedLineIndex + 1], timeline.values[this.selectedLineIndex + 1]];
+            return {
+              control: effectControl,
+              effect: effect,
+              timeline: timeline,
+              index: this.selectedLineIndex,
+              p1: p1,
+              p2: p2
+            };
+          }else{
+            return null;
+          }
         },
         effects() {
             const arr = [];
@@ -107,6 +132,10 @@ export default {
         this.chartDrawer.labels = this.model.labels;
         this.chartDrawer.cursorHandler = (overCursor)=>{
           this.onChartLine = overCursor;
+        };
+        this.chartDrawer.selectedLineChanged = (args)=>{
+          this.selectedTimelineIndex = args.timelineIndex;
+          this.selectedLineIndex = args.index;
         };
         this.$watch("model", () => {
             this.chartDrawer.timelines = this.model.timelines;

@@ -37,6 +37,17 @@ export default class TimeLineChartDrawer {
       const y = this.mouse[1];
       const result = this._hitTest(x, y);
       this.selected = result ? [result.timelineIndex,result.index] : null;
+      if(this.selected){
+        this.selectedLineChanged({
+          timelineIndex:result.timelineIndex,
+          index:result.index
+        });
+      }else{
+        this.selectedLineChanged({
+          timelineIndex:-1,
+          index:-1
+        });
+      }
       this.onDraw();
     }
 
@@ -104,7 +115,9 @@ export default class TimeLineChartDrawer {
                 const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, t, true);
                 const y = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j], true);
                 if (j === 0) {
-                    this.context.moveTo(x, y);
+                    const ix = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, 0, true);
+                    this.context.moveTo(ix, y);
+                    this.context.lineTo(x,y);
                 } else {
                     const e = timeline.effects[j - 1];
                     let type;
@@ -125,6 +138,10 @@ export default class TimeLineChartDrawer {
                         current: [x2, y2],
                         next: [x, y]
                     });
+                }
+                if(j === timeline.times.length - 1){
+                  const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j], true);
+                  this.context.lineTo(this.canvas.width,y2);
                 }
             }
             this.context.stroke();
@@ -169,6 +186,24 @@ export default class TimeLineChartDrawer {
             const timeline = this.timelines[i];
             const times = timeline.times;
             const values = timeline.values;
+            let sy;
+            // Check the points are existing outside of points
+            if(t < times[0] || t > times[times.length - 1]){
+              const index = t < times[0] ? 0 : times.length - 1;
+              const value = values[index];
+              const sy = LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,value,true);
+              if(Math.abs(y * 2 - sy) < 5.0){
+                return {
+                  timeline:timeline,
+                  timelineIndex:i,
+                  index:index,
+                  screenX:sx,
+                  screenX:sy,
+                  betweenPoints:false
+                };
+              }
+            }
+            // Check the points are existing inside of points
             for (let j = 0; j < times.length; j++) {
                 if (times[j] < t && times[j + 1] > t) {
                     const effect = timeline.effects[j];
@@ -189,7 +224,8 @@ export default class TimeLineChartDrawer {
                             timelineIndex:i,
                             index: j,
                             screenX: sx,
-                            screenY: sy
+                            screenY: sy,
+                            betweenPoints:true
                         };
                     }
                 }
