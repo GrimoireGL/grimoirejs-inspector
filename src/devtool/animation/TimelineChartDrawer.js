@@ -218,7 +218,8 @@ export default class TimeLineChartDrawer {
                     const ey = Effects[type].getValue({
                         current: [times[j], values[j]],
                         next: [times[j + 1], values[j + 1]],
-                        effect: effect
+                        effect: effect,
+                        EPS:LayoutCalculator.screenXToTime(this.scaleX,0,1,true)
                     }, (t - times[j]) / (times[j + 1] - times[j]));
                     const sy = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, ey, true);
                     const sx = x * 2;

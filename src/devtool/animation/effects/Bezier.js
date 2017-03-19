@@ -26,7 +26,7 @@ export default class Bezier{
     let actX = (args.next[0] - args.current[0]) * x + args.current[0];
     for(let i = 0; i < 500; i ++){
       const c = this.getBezierValue(t,args.current[0],args.effect.control[0],args.effect.control[2],args.next[0]);
-      if(Math.abs(c - actX) < 0.001){
+      if(Math.abs(c - actX) < args.EPS/2){
         break;
       }
       if(c < actX){
