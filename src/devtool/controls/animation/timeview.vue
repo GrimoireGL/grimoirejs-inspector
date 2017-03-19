@@ -16,7 +16,9 @@ export default {
     return {
       open:false,
       model:{
-        name:"Test Property",
+        target:"Test Property",
+        query:"#AAA",
+        component:"Transform",
         labels:[
           {
             name:"X",
@@ -86,9 +88,9 @@ export default {
 <style lang="stylus">
   .time-view-root
     display flex
-    height 15px
-    background-color dimgray
-    border-bottom solid 2px white
+    height 45px
+    background-color #222
+    border-bottom solid 1px #6DAFC4
     &.expand
       height 200px
 </style>

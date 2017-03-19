@@ -1,3 +1,4 @@
+
 export default class Linear{
   constructor(){
     this.optionalControl = null;
@@ -8,6 +9,6 @@ export default class Linear{
   }
 
   getValue(args,t){
-    return args.current[1] + (args.next[1] - args.current[1]) * t; 
+    return args.current[1] + (args.next[1] - args.current[1]) * t;
   }
 }

@@ -23,9 +23,13 @@ export default {
 
 <style lang="stylus">
   .timeview-expander
+    position relative
     height 100%
     width 16px
     z-index 100
+    background-color #222
+    p
+      user-select none
     p:hover
       cursor pointer
       user-select none

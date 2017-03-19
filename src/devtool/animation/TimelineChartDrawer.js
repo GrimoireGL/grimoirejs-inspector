@@ -10,18 +10,18 @@ export default class TimeLineChartDrawer {
     }
 
     _observeResize() {
-        window.addEventListener("resize", this.onResize.bind(this));
+        window.addEventListener("resize", this.resize.bind(this));
     }
 
-    onResize() {
+    resize() {
         this.canvas.style.width = this.canvas.parentElement.clientWidth + "px";
         this.canvas.style.height = this.canvas.parentElement.clientHeight + "px";
         this.canvas.height = this.canvas.parentElement.clientHeight * 2;
         this.canvas.width = this.canvas.parentElement.clientWidth * 2;
-        this.onDraw();
+        this.redraw();
     }
 
-    onDraw() {
+    redraw() {
         this._clear();
         this._drawGrid();
         if (this.expand) {
@@ -35,7 +35,7 @@ export default class TimeLineChartDrawer {
     onClick() {
       const x = this.mouse[0];
       const y = this.mouse[1];
-      const result = this._hitTest(x, y);
+      const result = this.hitTest(x, y);
       this.selected = result && result.betweenPoints ? [result.timelineIndex,result.index] : null;
       if(this.selected){
         this.selectedLineChanged({
@@ -48,7 +48,7 @@ export default class TimeLineChartDrawer {
           index:-1
         });
       }
-      this.onDraw();
+      this.redraw();
     }
 
     _clear() {
@@ -180,7 +180,7 @@ export default class TimeLineChartDrawer {
     }
 
     // check specified x,y pair intersects some of chart line
-    _hitTest(x, y) {
+    hitTest(x, y) {
         const t = LayoutCalculator.screenXToTime(this.scaleX, this.offsetX, x, true);
         for (let i = 0; i < this.timelines.length; i++) {
             const timeline = this.timelines[i];
@@ -199,6 +199,8 @@ export default class TimeLineChartDrawer {
                   index:index,
                   screenX:x * 2,
                   screenY:sy,
+                  time:t,
+                  value:value,
                   betweenPoints:false
                 };
               }
@@ -225,6 +227,8 @@ export default class TimeLineChartDrawer {
                             index: j,
                             screenX: sx,
                             screenY: sy,
+                            time:t,
+                            value:ey,
                             betweenPoints:true
                         };
                     }
@@ -237,7 +241,7 @@ export default class TimeLineChartDrawer {
     _drawPointer() {
         const x = this.mouse[0];
         const y = this.mouse[1];
-        const result = this._hitTest(x, y);
+        const result = this.hitTest(x, y);
         if (this.cursorHandler) {
             this.cursorHandler(!!result);
             if (result) {

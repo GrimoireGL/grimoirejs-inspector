@@ -1,6 +1,6 @@
 <template lang="html">
   <div class="timeview-chart-root">
-    <canvas :style="canvasStyle" ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down" v-on:click="click"/>
+    <canvas :style="canvasStyle" ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down" v-on:click="click" v-on:dblclick="dblclick"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
           <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" v-on:drag="handleDrag(value,$event)" size="4"/>
@@ -137,37 +137,37 @@ export default {
         this.$watch("model", () => {
             this.chartDrawer.timelines = this.model.timelines;
             this.chartDrawer.labels = this.model.labels;
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         });
         this.$watch("expand", () => {
             this.chartDrawer.expand = this.expand;
-            this.chartDrawer.onResize();
+            this.chartDrawer.resize();
         });
         this.$watch("offsetX", () => {
             this.chartDrawer.offsetX = this.offsetX;
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         }, {
             immediate: true
         });
         this.$watch("scaleX", () => {
             this.chartDrawer.scaleX = this.scaleX;
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         }, {
             immediate: true
         });
         this.$watch("offsetY", () => {
             this.chartDrawer.offsetY = this.offsetY;
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         }, {
             immediate: true
         });
         this.$watch("scaleY", () => {
             this.chartDrawer.scaleY = this.scaleY;
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         }, {
             immediate: true
         });
-        this.chartDrawer.onResize();
+        this.chartDrawer.resize();
     },
     methods: {
         wheel(e) {
@@ -200,7 +200,7 @@ export default {
             this.lastX = e.offsetX;
             this.lastY = e.offsetY;
             this.chartDrawer.mouse = [e.offsetX, e.offsetY];
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         },
         down(e) {
             this.drag = true;
@@ -233,42 +233,67 @@ export default {
             val.timeline.times.splice(val.index, 1, val.timeline.times[val.index] + xdiff);
             val.timeline.values.splice(val.index, 1, val.timeline.values[val.index] - ydiff);
             // verify effect parameters
-            if (val.index > 0) { // previous effect
-                const effect = val.timeline.effects[val.index - 1];
-                const type = this.getType(effect);
-                if(Effects[type].movePoint){
+            this.adjustMovePoint(val.timeline,val.index);
+            this.chartDrawer.redraw();
+        },
+        adjustMovePoint(timeline,index){
+          if (index > 0) { // previous effect
+              const effect = timeline.effects[index - 1];
+              const type = this.getType(effect);
+              if(Effects[type].movePoint){
+                Effects[type].movePoint({
+                    point: [timeline.times[index], timeline.values[index]],
+                    timeline: timeline,
+                    effect: effect,
+                    previous:true
+                });
+                // notify array changed
+                timeline.effects.splice(index - 1, 1, Object.assign(effect));
+              }
+          }
+          if (index !== timeline.times.length - 1) { // next effect
+              const effect = timeline.effects[index];
+              const type = this.getType(effect);
+              if (Effects[type].movePoint) {
                   Effects[type].movePoint({
-                      point: [val.timeline.times[val.index], val.timeline.values[val.index]],
-                      timeline: val.timeline,
+                      point: [timeline.times[index], timeline.values[index]],
+                      timeline: timeline,
                       effect: effect,
-                      previous:true
+                      previous:false
                   });
                   // notify array changed
-                  val.timeline.effects.splice(val.index - 1, 1, Object.assign(effect));
-                }
-            }
-            if (val.index !== val.timeline.times.length - 1) { // next effect
-                const effect = val.timeline.effects[val.index];
-                const type = this.getType(effect);
-                if (Effects[type].movePoint) {
-                    Effects[type].movePoint({
-                        point: [val.timeline.times[val.index], val.timeline.values[val.index]],
-                        timeline: val.timeline,
-                        effect: effect,
-                        previous:false
-                    });
-                    // notify array changed
-                    val.timeline.effects.splice(val.index, 1, Object.assign(effect));
-                }
-            }
-            this.chartDrawer.onDraw();
+                  timeline.effects.splice(index, 1, Object.assign(effect));
+              }
+          }
         },
         effectChanged(v, e) {
             v.timeline.effects.splice(v.index, 1, e);
-            this.chartDrawer.onDraw();
+            this.chartDrawer.redraw();
         },
         click(e) {
             this.chartDrawer.onClick();
+        },
+        dblclick(e){
+          const result = this.chartDrawer.hitTest(e.offsetX,e.offsetY);
+          if(result){
+            let insertIndex = -1;
+            if(result.betweenPoints){
+              insertIndex = result.index + 1;
+            }else{
+              if(result.index === 0){
+                insertIndex = 0;
+              }else{
+                insertIndex = result.timeline.times.length;
+              }
+            }
+            result.timeline.times.splice(insertIndex,0,result.time);
+            result.timeline.values.splice(insertIndex,0,result.value);
+            result.timeline.effects.splice(insertIndex,0,{});
+            this.adjustMovePoint(result.timeline,insertIndex);
+            if(insertIndex !== 0){
+              this.adjustMovePoint(result.timeline,insertIndex - 1);
+            }
+          }
         },
         getType(effect) {
             if (!effect || !effect.type) {

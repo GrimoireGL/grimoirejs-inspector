@@ -6,19 +6,19 @@ export default class TimebeltDrawer {
     }
 
     _observeResize() {
-        window.addEventListener("resize", this.onResize.bind(this));
+        window.addEventListener("resize", this.resize.bind(this));
     }
 
-    onResize() {
+    resize() {
         this.canvas.style.width = this.canvas.parentElement.clientWidth + "px";
         this.canvas.style.height = this.canvas.parentElement.clientHeight + "px";
         this.canvas.height = this.canvas.parentElement.clientHeight * 2;
         this.canvas.width = this.canvas.parentElement.clientWidth * 2;
-        this.onDraw();
+        this.redraw();
     }
 
 
-    onDraw() {
+    redraw() {
         this._clear();
         this._drawGrid();
     }

@@ -32,17 +32,17 @@ export default {
         this.beltDrawer = new TimebeltDrawer(this.$refs.timebelt);
         this.$watch("offsetX", () => {
             this.beltDrawer.offsetX = this.offsetX;
-            this.beltDrawer.onDraw();
+            this.beltDrawer.redraw();
         }, {
             immediate: true
         });
         this.$watch("scaleX", () => {
             this.beltDrawer.scale = this.scaleX;
-            this.beltDrawer.onDraw();
+            this.beltDrawer.redraw();
         }, {
             immediate: true
         });
-        this.beltDrawer.onResize();
+        this.beltDrawer.resize();
     },
     methods:{
       wheel(e){
