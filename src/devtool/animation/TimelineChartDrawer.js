@@ -36,7 +36,7 @@ export default class TimeLineChartDrawer {
       const x = this.mouse[0];
       const y = this.mouse[1];
       const result = this._hitTest(x, y);
-      this.selected = result ? [result.timelineIndex,result.index] : null;
+      this.selected = result && result.betweenPoints ? [result.timelineIndex,result.index] : null;
       if(this.selected){
         this.selectedLineChanged({
           timelineIndex:result.timelineIndex,
@@ -85,13 +85,13 @@ export default class TimeLineChartDrawer {
         }
         let stride = LayoutCalculator.getStride(this.scaleX);
         let lastX = stride - (this.offsetX % stride);
-        for (let grid of LayoutCalculator.columnEnumrator(this.scaleX, this.offsetX)) {
-            if (grid.screenX > this.canvas.width) {
+        for (let column of LayoutCalculator.columnEnumrator(this.scaleX, this.offsetX)) {
+            if (column.screenX > this.canvas.width) {
                 break;
             }
-            const width = LayoutCalculator.getWidthByImportance(grid.importance);
-            const style = LayoutCalculator.getStyleByImportance(grid.importance);
-            this._drawVertical(grid.screenX, width, style);
+            const width = LayoutCalculator.getWidthByImportance(column.importance);
+            const style = LayoutCalculator.getStyleByImportance(column.importance);
+            this._drawVertical(column.screenX, width, style);
         }
         for (let row of LayoutCalculator.rowEnumrator(this.scaleY, this.offsetY)) {
             const importance = row.importance;
@@ -197,8 +197,8 @@ export default class TimeLineChartDrawer {
                   timeline:timeline,
                   timelineIndex:i,
                   index:index,
-                  screenX:sx,
-                  screenX:sy,
+                  screenX:x * 2,
+                  screenY:sy,
                   betweenPoints:false
                 };
               }

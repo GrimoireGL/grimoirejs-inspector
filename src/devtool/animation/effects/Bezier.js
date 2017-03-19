@@ -43,4 +43,25 @@ export default class Bezier{
     const it = 1 - t;
     return Math.pow(it,3) * p1 +  3 * Math.pow(it,2) * t * p2 + 3 * it * Math.pow(t,2) * p3 + Math.pow(t,3) * p4;
   }
+
+  movePoint(args){
+    const effect = args.effect;
+    if(args.previous){
+      // control point X can not exceed point x
+      if(effect.control[0] > args.point[0]){
+        effect.control.splice(0,1,args.point[0]);
+      }
+      if(effect.control[2] > args.point[0]){
+        effect.control.splice(2,1,args.point[0]);
+      }
+    }else{
+      // point x cannnot exceeds control point x
+      if(effect.control[0] < args.point[0]){
+        effect.control.splice(0,1,args.point[0]);
+      }
+      if(effect.control[2] < args.point[0]){
+        effect.control.splice(2,1,args.point[0]);
+      }
+    }
+  }
 }

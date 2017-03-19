@@ -1,4 +1,4 @@
-\<template lang="html">
+<template lang="html">
   <div class="timeview-chart-root">
     <canvas :style="canvasStyle" ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down" v-on:click="click"/>
     <div class="timeview-chart-points" v-if="expand">
@@ -29,18 +29,18 @@ export default {
             lastX: 0,
             lastY: 0,
             drag: false,
-            onChartLine:false,
-            selectedTimelineIndex:-1,
-            selectedLineIndex:-1
+            onChartLine: false,
+            selectedTimelineIndex: -1,
+            selectedLineIndex: -1
         }
     },
     computed: {
-        canvasStyle(){
-          return {
-            cursor:(this.onChartLine ? "pointer" : "default"),
-            width:"300px",
-            height:"400px"
-          };
+        canvasStyle() {
+            return {
+                cursor: (this.onChartLine ? "pointer" : "default"),
+                width: "300px",
+                height: "400px"
+            };
         },
         points() {
             const arr = [];
@@ -60,30 +60,27 @@ export default {
             }
             return arr;
         },
-        selection(){
-          if(this.selectedTimelineIndex >= 0 && this.selectedLineIndex >= 0){
-            const timeline = this.model.timelines[this.selectedTimelineIndex];
-            const effect = timeline.effects[this.selectedLineIndex];
-            if(!effect || !effect.type){
-              return null;
-            }
-            const effectControl = Effects[effect.type].optionalControl;
-            if (effectControl === null) {
+        selection() {
+            if (this.selectedTimelineIndex >= 0 && this.selectedLineIndex >= 0) {
+                const timeline = this.model.timelines[this.selectedTimelineIndex];
+                const effect = timeline.effects[this.selectedLineIndex];
+                const effectControl = Effects[this.getType(effect)].optionalControl;
+                if (effectControl === null) {
+                    return null;
+                }
+                const p1 = [timeline.times[this.selectedLineIndex], timeline.values[this.selectedLineIndex]];
+                const p2 = [timeline.times[this.selectedLineIndex + 1], timeline.values[this.selectedLineIndex + 1]];
+                return {
+                    control: effectControl,
+                    effect: effect,
+                    timeline: timeline,
+                    index: this.selectedLineIndex,
+                    p1: p1,
+                    p2: p2
+                };
+            } else {
                 return null;
             }
-            const p1 = [timeline.times[this.selectedLineIndex], timeline.values[this.selectedLineIndex]];
-            const p2 = [timeline.times[this.selectedLineIndex + 1], timeline.values[this.selectedLineIndex + 1]];
-            return {
-              control: effectControl,
-              effect: effect,
-              timeline: timeline,
-              index: this.selectedLineIndex,
-              p1: p1,
-              p2: p2
-            };
-          }else{
-            return null;
-          }
         },
         effects() {
             const arr = [];
@@ -92,8 +89,8 @@ export default {
                 const timeline = this.model.timelines[i];
                 for (let j = 0; j < timeline.effects.length; j++) {
                     const effect = timeline.effects[j];
-                    if(!effect || !effect.type){
-                      continue;
+                    if (!effect || !effect.type) {
+                        continue;
                     }
                     const effectControl = Effects[effect.type].optionalControl;
                     if (effectControl === null) {
@@ -130,12 +127,12 @@ export default {
         this.chartDrawer = new TimeLineChartDrawer(this.$refs.chart, this.expand);
         this.chartDrawer.timelines = this.model.timelines;
         this.chartDrawer.labels = this.model.labels;
-        this.chartDrawer.cursorHandler = (overCursor)=>{
-          this.onChartLine = overCursor;
+        this.chartDrawer.cursorHandler = (overCursor) => {
+            this.onChartLine = overCursor;
         };
-        this.chartDrawer.selectedLineChanged = (args)=>{
-          this.selectedTimelineIndex = args.timelineIndex;
-          this.selectedLineIndex = args.index;
+        this.chartDrawer.selectedLineChanged = (args) => {
+            this.selectedTimelineIndex = args.timelineIndex;
+            this.selectedLineIndex = args.index;
         };
         this.$watch("model", () => {
             this.chartDrawer.timelines = this.model.timelines;
@@ -182,15 +179,15 @@ export default {
             }
             if (Math.abs(e.deltaY) >= 0.0) {
                 if (e.ctrlKey) {
-                  let scale = this.scaleY;
-                  const lastScale = scale;
-                  scale*= 1.0 + e.deltaY * 0.01;
-                  if (this.scaleY !== scale && scale > 0.001 && scale < 1000) {
-                      // const timeDelta = LayoutCalculator.screenXToTime(scale,0,this.lastX)
-                      // - LayoutCalculator.screenXToTime(lastScale,0,this.lastX);
-                      // this.setOffset(this.offsetX - timeDelta / 2.0)
-                      this.$emit("scaleYChanged",scale);
-                  }
+                    let scale = this.scaleY;
+                    const lastScale = scale;
+                    scale *= 1.0 + e.deltaY * 0.01;
+                    if (this.scaleY !== scale && scale > 0.001 && scale < 1000) {
+                        // const timeDelta = LayoutCalculator.screenXToTime(scale,0,this.lastX)
+                        // - LayoutCalculator.screenXToTime(lastScale,0,this.lastX);
+                        // this.setOffset(this.offsetX - timeDelta / 2.0)
+                        this.$emit("scaleYChanged", scale);
+                    }
                 } else {
                     const offsetY = LayoutCalculator.movementYToValueDelta(this.scaleY, -e.deltaY) + this.offsetY;
                     if (offsetY !== this.offsetY) {
@@ -202,7 +199,7 @@ export default {
         move(e) {
             this.lastX = e.offsetX;
             this.lastY = e.offsetY;
-            this.chartDrawer.mouse = [e.offsetX,e.offsetY];
+            this.chartDrawer.mouse = [e.offsetX, e.offsetY];
             this.chartDrawer.onDraw();
         },
         down(e) {
@@ -212,6 +209,7 @@ export default {
             return LayoutCalculator.timeToScreenX(t) + "px";
         },
         handleDrag(val, e) {
+            // move points
             const xdiff = LayoutCalculator.movementXToTimeDelta(this.scaleX, e.movementX);
             if (val.timeline.times[val.index] + xdiff < 0) {
                 return;
@@ -230,17 +228,53 @@ export default {
                     }
                 }
             }
+            // move point data
             const ydiff = LayoutCalculator.movementYToValueDelta(this.scaleY, e.movementY);
             val.timeline.times.splice(val.index, 1, val.timeline.times[val.index] + xdiff);
             val.timeline.values.splice(val.index, 1, val.timeline.values[val.index] - ydiff);
+            // verify effect parameters
+            if (val.index > 0) { // previous effect
+                const effect = val.timeline.effects[val.index - 1];
+                const type = this.getType(effect);
+                if(Effects[type].movePoint){
+                  Effects[type].movePoint({
+                      point: [val.timeline.times[val.index], val.timeline.values[val.index]],
+                      timeline: val.timeline,
+                      effect: effect,
+                      previous:true
+                  });
+                  // notify array changed
+                  val.timeline.effects.splice(val.index - 1, 1, Object.assign(effect));
+                }
+            }
+            if (val.index !== val.timeline.times.length - 1) { // next effect
+                const effect = val.timeline.effects[val.index];
+                const type = this.getType(effect);
+                if (Effects[type].movePoint) {
+                    Effects[type].movePoint({
+                        point: [val.timeline.times[val.index], val.timeline.values[val.index]],
+                        timeline: val.timeline,
+                        effect: effect,
+                        previous:false
+                    });
+                    // notify array changed
+                    val.timeline.effects.splice(val.index, 1, Object.assign(effect));
+                }
+            }
             this.chartDrawer.onDraw();
         },
         effectChanged(v, e) {
             v.timeline.effects.splice(v.index, 1, e);
             this.chartDrawer.onDraw();
         },
-        click(e){
-          this.chartDrawer.onClick();
+        click(e) {
+            this.chartDrawer.onClick();
+        },
+        getType(effect) {
+            if (!effect || !effect.type) {
+                return "LINEAR";
+            }
+            return effect.type;
         },
         ...mapMutations("animation", ["setOffsetX"])
     }
