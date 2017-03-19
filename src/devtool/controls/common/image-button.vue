@@ -1,8 +1,9 @@
 <template lang="html">
   <div class="image-button-container">
     <div :style="borderStyle" class="image-button-border-container">
-      <img :src="src">
-      <div class="image-button-overlay">
+      <img :src="src" v-if="!isSVG">
+      <svg :src="src" v-if="isSVG"/>
+      <div class="image-button-overlay" @click="click">
       </div>
     </div>
   </div>
@@ -10,13 +11,18 @@
 
 <script>
 export default {
-  props:["src","height","width"],
+  props:["src","height","width","isSVG"],
   computed:{
     borderStyle(){
       return {
         width: this.width + "px",
         height: this.height + "px"
       };
+    }
+  },
+  methods:{
+    click(){
+      this.$emit("click");
     }
   }
 }
@@ -41,5 +47,7 @@ export default {
         &:hover
           opacity 0.3
           cursor pointer
+    .svg-hover-stroke-highlight:hover
+      color orange
 
 </style>

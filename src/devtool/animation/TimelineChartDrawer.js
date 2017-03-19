@@ -23,7 +23,7 @@ export default class TimeLineChartDrawer {
 
     redraw() {
         this._clear();
-        this._drawGrid();
+        this._drawGrid(this.expand);
         if (this.expand) {
             this._drawChart();
             this._drawPointer();
@@ -33,22 +33,22 @@ export default class TimeLineChartDrawer {
     }
 
     onClick() {
-      const x = this.mouse[0];
-      const y = this.mouse[1];
-      const result = this.hitTest(x, y);
-      this.selected = result && result.betweenPoints ? [result.timelineIndex,result.index] : null;
-      if(this.selected){
-        this.selectedLineChanged({
-          timelineIndex:result.timelineIndex,
-          index:result.index
-        });
-      }else{
-        this.selectedLineChanged({
-          timelineIndex:-1,
-          index:-1
-        });
-      }
-      this.redraw();
+        const x = this.mouse[0];
+        const y = this.mouse[1];
+        const result = this.hitTest(x, y);
+        this.selected = result && result.betweenPoints ? [result.timelineIndex, result.index] : null;
+        if (this.selected) {
+            this.selectedLineChanged({
+                timelineIndex: result.timelineIndex,
+                index: result.index
+            });
+        } else {
+            this.selectedLineChanged({
+                timelineIndex: -1,
+                index: -1
+            });
+        }
+        this.redraw();
     }
 
     _clear() {
@@ -79,7 +79,7 @@ export default class TimeLineChartDrawer {
     }
 
 
-    _drawGrid() {
+    _drawGrid(useHorizontal) {
         if (this.offsetX === void 0 || this.scaleX === void 0 || this.scaleY === void 0 || this.offsetY === void 0) {
             return;
         }
@@ -93,11 +93,13 @@ export default class TimeLineChartDrawer {
             const style = LayoutCalculator.getStyleByImportance(column.importance);
             this._drawVertical(column.screenX, width, style);
         }
-        for (let row of LayoutCalculator.rowEnumrator(this.scaleY, this.offsetY)) {
-            const importance = row.importance;
-            this._drawHorizontal(row.screenY, LayoutCalculator.getWidthByImportance(importance), LayoutCalculator.getStyleByImportance(importance, true));
-            if (importance >= 1)
-                this._drawText(row.value, row.screenY, LayoutCalculator.getStyleByImportance(importance, true));
+        if (useHorizontal) {
+            for (let row of LayoutCalculator.rowEnumrator(this.scaleY, this.offsetY)) {
+                const importance = row.importance;
+                this._drawHorizontal(row.screenY, LayoutCalculator.getWidthByImportance(importance), LayoutCalculator.getStyleByImportance(importance, true));
+                if (importance >= 1)
+                    this._drawText(row.value, row.screenY, LayoutCalculator.getStyleByImportance(importance, true));
+            }
         }
     }
 
@@ -117,7 +119,7 @@ export default class TimeLineChartDrawer {
                 if (j === 0) {
                     const ix = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, 0, true);
                     this.context.moveTo(ix, y);
-                    this.context.lineTo(x,y);
+                    this.context.lineTo(x, y);
                 } else {
                     const e = timeline.effects[j - 1];
                     let type;
@@ -139,43 +141,43 @@ export default class TimeLineChartDrawer {
                         next: [x, y]
                     });
                 }
-                if(j === timeline.times.length - 1){
-                  const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j], true);
-                  this.context.lineTo(this.canvas.width,y2);
+                if (j === timeline.times.length - 1) {
+                    const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j], true);
+                    this.context.lineTo(this.canvas.width, y2);
                 }
             }
             this.context.stroke();
         }
         // Draw highlighted lines
-        if(this.selected){
-          const timeline = this.timelines[this.selected[0]];
-          this.context.beginPath();
-          this.context.lineWidth = 6;
-          this.context.strokeStyle = this.labels[this.selected[0]].color;
-          const currentIndex = this.selected[1];
-          const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex], true);
-          const y = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex], true);
-          this.context.moveTo(x,y);
-          const e = timeline.effects[currentIndex];
-          let type;
-          if (!e || e.type === void 0 || e.type === "LINEAR") {
-              type = "LINEAR"
-          } else {
-              type = e.type;
-          }
-          const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex + 1], true);
-          const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex + 1], true);
-          Effects[type].drawEffect({
-              context: this.context,
-              scaleX: this.scaleX,
-              scaleY: this.scaleY,
-              offsetX: this.offsetX,
-              offsetY: this.offsetY,
-              effect: e,
-              current: [x, y],
-              next: [x2, y2]
-          });
-          this.context.stroke();
+        if (this.selected) {
+            const timeline = this.timelines[this.selected[0]];
+            this.context.beginPath();
+            this.context.lineWidth = 6;
+            this.context.strokeStyle = this.labels[this.selected[0]].color;
+            const currentIndex = this.selected[1];
+            const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex], true);
+            const y = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex], true);
+            this.context.moveTo(x, y);
+            const e = timeline.effects[currentIndex];
+            let type;
+            if (!e || e.type === void 0 || e.type === "LINEAR") {
+                type = "LINEAR"
+            } else {
+                type = e.type;
+            }
+            const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex + 1], true);
+            const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex + 1], true);
+            Effects[type].drawEffect({
+                context: this.context,
+                scaleX: this.scaleX,
+                scaleY: this.scaleY,
+                offsetX: this.offsetX,
+                offsetY: this.offsetY,
+                effect: e,
+                current: [x, y],
+                next: [x2, y2]
+            });
+            this.context.stroke();
         }
     }
 
@@ -188,22 +190,22 @@ export default class TimeLineChartDrawer {
             const values = timeline.values;
             let sy;
             // Check the points are existing outside of points
-            if(t < times[0] || t > times[times.length - 1]){
-              const index = t < times[0] ? 0 : times.length - 1;
-              const value = values[index];
-              const sy = LayoutCalculator.valueToScreenY(this.scaleY,this.offsetY,value,true);
-              if(Math.abs(y * 2 - sy) < 5.0){
-                return {
-                  timeline:timeline,
-                  timelineIndex:i,
-                  index:index,
-                  screenX:x * 2,
-                  screenY:sy,
-                  time:t,
-                  value:value,
-                  betweenPoints:false
-                };
-              }
+            if (t < times[0] || t > times[times.length - 1]) {
+                const index = t < times[0] ? 0 : times.length - 1;
+                const value = values[index];
+                const sy = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, value, true);
+                if (Math.abs(y * 2 - sy) < 5.0) {
+                    return {
+                        timeline: timeline,
+                        timelineIndex: i,
+                        index: index,
+                        screenX: x * 2,
+                        screenY: sy,
+                        time: t,
+                        value: value,
+                        betweenPoints: false
+                    };
+                }
             }
             // Check the points are existing inside of points
             for (let j = 0; j < times.length; j++) {
@@ -223,13 +225,13 @@ export default class TimeLineChartDrawer {
                     if (Math.abs(y * 2 - sy) < 5.0) {
                         return {
                             timeline: timeline,
-                            timelineIndex:i,
+                            timelineIndex: i,
                             index: j,
                             screenX: sx,
                             screenY: sy,
-                            time:t,
-                            value:ey,
-                            betweenPoints:true
+                            time: t,
+                            value: ey,
+                            betweenPoints: true
                         };
                     }
                 }

@@ -1,13 +1,20 @@
 <template lang="html">
+  <div class="timeview-chart-root-wrap">
+    <div class="animation-popup-container">
+      <div class="popup-container-inside" :style="popupContainerStyle" @mousedown.stop>
+        <Popup @effectTypeChanged="effectTypeChanged"/>
+      </div>
+    </div>
   <div class="timeview-chart-root">
-    <canvas :style="canvasStyle" ref="chart" class="animation-chart" v-on:wheel.prevent="wheel" v-on:mousemove="move" v-on:mousedown="down" v-on:click="click" v-on:dblclick="dblclick"/>
+    <canvas :style="canvasStyle" ref="chart" class="animation-chart" @wheel.prevent="wheel" @mousemove="move" @mousedown="down" @click="click" @dblclick="dblclick" @contextmenu="contextmenu"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
-          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" v-on:drag="handleDrag(value,$event)" size="4"/>
+          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" @drag="handleDrag(value,$event)" size="4"/>
       </div>
-      <components v-if="selection" :is="selection.control" :effect="selection.effect" :p1="selection.p1" :p2="selection.p2" :offsetY="offsetY" :scaleY="scaleY" v-on:effectChanged="effectChanged(selection,$event)"/>
+      <components v-if="selection" :is="selection.control" :effect="selection.effect" :p1="selection.p1" :p2="selection.p2" :offsetY="offsetY" :scaleY="scaleY" @effectChanged="effectChanged(selection,$event)"/>
     </div>
   </div>
+</div>
 </template>
 
 <script>
@@ -15,13 +22,16 @@ import TimeLineChartDrawer from "../../animation/TimeLineChartDrawer";
 import Point from "./timeline-point.vue";
 import LayoutCalculator from "../../animation/LayoutCalculator";
 import Effects from "../../animation/Effects";
+import Popup from "./popup.vue";
+import EffectConfigurators from "../../animation/EffectConfigurators";
 import {
     mapState,
     mapMutations
 } from "vuex";
 export default {
     components: {
-        Point
+        Point,
+        Popup
     },
     props: ["expand", "model", "offsetY", "scaleY"],
     data() {
@@ -31,7 +41,10 @@ export default {
             drag: false,
             onChartLine: false,
             selectedTimelineIndex: -1,
-            selectedLineIndex: -1
+            selectedLineIndex: -1,
+            popupPosition:[0,0],
+            popupOpen:false,
+            currentPopupSelection:null
         }
     },
     computed: {
@@ -41,6 +54,13 @@ export default {
                 width: "300px",
                 height: "400px"
             };
+        },
+        popupContainerStyle(){
+          return {
+            left:this.popupPosition[0] + "px",
+            top: this.popupPosition[1] + "px",
+            display: this.popupOpen ? "block" : "none"
+          };
         },
         points() {
             const arr = [];
@@ -115,6 +135,10 @@ export default {
     mounted() {
         document.addEventListener("mouseup", (e) => {
             this.drag = false;
+
+        });
+        document.addEventListener("mousedown",(e)=>{
+            this.popupOpen = false;
         });
         document.addEventListener("mousemove", (e) => {
             if (this.drag) {
@@ -171,6 +195,7 @@ export default {
     },
     methods: {
         wheel(e) {
+            this.popupOpen = false;
             if (Math.abs(e.deltaX) >= 0.0) {
                 const offsetX = Math.max(0, LayoutCalculator.screenXToTime(this.scaleX, 0, e.deltaX) + this.offsetX);
                 if (offsetX !== this.offsetX) {
@@ -273,6 +298,19 @@ export default {
         click(e) {
             this.chartDrawer.onClick();
         },
+        contextmenu(e){
+          e.preventDefault();
+          this.chartDrawer.onClick();
+          const result = this.chartDrawer.hitTest(e.offsetX,e.offsetY);
+          if(result && result.betweenPoints){
+            this.popupPosition = [result.screenX/2,result.screenY/2];
+            this.popupOpen = true;
+            this.currentPopupSelection = {
+              timeline:result.timeline,
+              index:result.index
+            };
+          }
+        },
         dblclick(e){
           const result = this.chartDrawer.hitTest(e.offsetX,e.offsetY);
           if(result){
@@ -293,6 +331,7 @@ export default {
             if(insertIndex !== 0){
               this.adjustMovePoint(result.timeline,insertIndex - 1);
             }
+            this.chartDrawer.redraw();
           }
         },
         getType(effect) {
@@ -301,25 +340,48 @@ export default {
             }
             return effect.type;
         },
+        effectTypeChanged(type){
+          const selections = this.currentPopupSelection;
+          const i = selections.index;
+          const timeline = selections.timeline;
+          const ne = EffectConfigurators[type]({
+            current:[timeline.times[i],timeline.values[i]],
+            next:[timeline.times[i + 1],timeline.values[i + 1]]
+          });
+          timeline.effects.splice(selections.index,1,ne);
+          this.chartDrawer.redraw();
+        },
         ...mapMutations("animation", ["setOffsetX"])
     }
 }
 </script>
 
 <style lang="stylus">
-  .timeview-chart-root
+  .timeview-chart-root-wrap
     position relative
+    width 100%
     height 100%
-    overflow-x hidden
-    overflow-y hidden
     flex 1
-    canvas
-      user-select none
-      background-color #222
-  .timeview-chart-points
-    position absolute
-    top 0px
-    left 0px
-    .point-container
+    .timeview-chart-root
+      position relative
+      height 100%
+      width 100%
+      overflow-x hidden
+      overflow-y hidden
+      canvas
+        user-select none
+        background-color #222
+    .timeview-chart-points
       position absolute
+      top 0px
+      left 0px
+      .point-container
+        position absolute
+    .animation-popup-container
+      position relative
+      z-index 100000
+      .popup-container-inside
+        position absolute
+        width 10px
+        height 10px
 </style>
