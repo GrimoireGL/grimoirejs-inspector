@@ -3,7 +3,7 @@
    <g>
     <title>{{value}}</title>
       <g id="svg_2">
-        <circle :fill="color" stroke="#000000" :stroke-width="strokeWidth" cx="6" cy="6" :r="size" id="svg_1"/>
+        <circle :fill="color" :stroke="strokeColor" :stroke-width="strokeWidth" cx="6" cy="6" :r="size" id="svg_1"/>
       </g>
    </g>
   </svg>
@@ -11,12 +11,11 @@
 
 <script>
 export default {
-  props:["color","left","top","size","value"],
+  props:["color","left","top","size","value","selected"],
   data(){
     return {
       mouseon:false,
-      mousehold:false,
-      selected:false
+      mousehold:false
     };
   },
   computed:{
@@ -48,6 +47,9 @@ export default {
     },
     click(){
       this.$emit("click");
+    },
+    deletePressed(){
+      debugger;
     }
   },
   mounted(){

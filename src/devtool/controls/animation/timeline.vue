@@ -3,8 +3,8 @@
     <TimeBelt :timeViewHeight="timeViewHeight"/>
     <div class="timeview-scroll-container">
       <div ref="timeviews" class="timeview-container">
-        <Timeview  v-on:expandChanged="expandChanged"/>
-        <Timeview v-on:expandChanged="expandChanged"/>
+        <Timeview  v-on:expandChanged="expandChanged" @activate="activate(0)" :active="activeTimeline === 0"/>
+        <Timeview v-on:expandChanged="expandChanged" @activate="activate(1)" :active="activeTimeline === 1"/>
       </div>
     </div>
   </div>
@@ -18,6 +18,7 @@ export default {
   data(){
     return {
       timeViewHeight:0,
+      activeTimeline:0
     };
   },
   components:{
@@ -27,6 +28,9 @@ export default {
   methods:{
     expandChanged(){
       this.timeViewHeight = this.$refs.timeviews.clientHeight;
+    },
+    activate(i){
+      this.activeTimeline = i;
     },
     ...mapMutations("animation",["setOffsetX","setOffsetY","setScaleX","setScaleY","setCurrentTime"])
   },

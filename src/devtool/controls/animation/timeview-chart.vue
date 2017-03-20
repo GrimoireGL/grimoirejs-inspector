@@ -9,7 +9,7 @@
     <canvas :style="canvasStyle" ref="chart" class="animation-chart" @wheel.prevent="wheel" @mousemove="move" @mousedown="down" @click="click" @dblclick="dblclick" @contextmenu="contextmenu"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
-          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" @drag="handleDrag(value,$event)" @click="handleClick(value,$event)" size="4"/>
+          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" @drag="handleDrag(value,$event)" @click="handleClick(value,$event)" :selected="value.selected" size="4"/>
       </div>
       <components v-if="selectedEffect" :is="selectedEffect.control" :effect="selectedEffect.effect" :p1="selectedEffect.p1" :p2="selectedEffect.p2" :offsetY="offsetY" :scaleY="scaleY" @effectChanged="effectChanged(selectedEffect,$event)"/>
     </div>
@@ -33,7 +33,7 @@ export default {
         Point,
         Popup
     },
-    props: ["expand", "model", "offsetY", "scaleY"],
+    props: ["expand", "model", "offsetY", "scaleY","active"],
     data() {
         return {
             lastX: 0,
@@ -42,10 +42,10 @@ export default {
             onChartLine: false,
             selectedTimelineIndex: -1,
             selectedLineIndex: -1,
-            selectedPoint: -1,
+            selectedPointIndex: -1,
             popupPosition:[0,0],
             popupOpen:false,
-            currentPopupSelection:null,
+            currentPopupSelection:null
         }
     },
     computed: {
@@ -53,7 +53,7 @@ export default {
           if(this.selectedTimelineIndex === -1){
             return null;
           }else{
-            if(this.selectedPoint !== -1){
+            if(this.selectedPointIndex !== -1){
               return "point";
             }
             else{
@@ -81,13 +81,19 @@ export default {
                 const label = this.model.labels[i];
                 const timeline = this.model.timelines[i];
                 for (let j = 0; j < timeline.times.length; j++) {
+                  let selected = false;
+                  if(i === this.selectedTimelineIndex && j === this.selectedPointIndex && this.selectedType === "point"){
+                    selected = true;
+                  }
                     arr.push({
+                        timelineIndex:i,
                         timeline: timeline,
                         index: j,
                         color: label.color,
                         left: LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[j]),
                         top: LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j]),
-                        value: timeline.values[j]
+                        value: timeline.values[j],
+                        selected:selected
                     })
                 }
             }
@@ -124,6 +130,20 @@ export default {
         document.addEventListener("mousedown",(e)=>{
             this.popupOpen = false;
         });
+        document.addEventListener("keydown",(e)=>{
+          if(e.keyCode === 8 || e.KeyCode === 46){
+            if(this.active && this.selectedType === "point" && this.selectedPointIndex !== -1){
+              const timeline = this.model.timelines[this.selectedTimelineIndex];
+              if(this.selectedPointIndex === 0 && timeline.times.length === 1){
+                return;
+              }
+              timeline.times.splice(this.selectedPointIndex,1);
+              timeline.values.splice(this.selectedPointIndex,1);
+              timeline.effects.splice(this.selectedPointIndex,1);
+              this.chartDrawer.redraw();
+            }
+          }
+        });
         document.addEventListener("mousemove", (e) => {
             if (this.drag) {
                 const nx = this.offsetX - LayoutCalculator.movementXToTimeDelta(this.scaleX, e.movementX);
@@ -138,9 +158,16 @@ export default {
         this.chartDrawer.cursorHandler = (overCursor) => {
             this.onChartLine = overCursor;
         };
-        this.chartDrawer.selectedLineChanged = (args) => {
+        this.chartDrawer.lineClicked = (args) => {
             this.selectedTimelineIndex = args.timelineIndex;
             this.selectedLineIndex = args.index;
+            this.selectedPointIndex = -1;
+            if(args.hitTestResult && args.hitTestResult.betweenPoints){
+              const result = args.hitTestResult;
+              this.chartDrawer.selectLine(result.timelineIndex,result.index);
+            }else{
+              this.chartDrawer.unselectLine();
+            }
         };
         this.$watch("model", () => {
             this.chartDrawer.timelines = this.model.timelines;
@@ -169,6 +196,15 @@ export default {
         }, {
             immediate: true
         });
+        this.$watch("active",()=>{
+          if(!this.active){
+            debugger;
+            this.chartDrawer.unselectLine();
+            this.selectedLineIndex = -1;
+            this.selectedPointIndex = -1;
+            this.selectedTimelineIndex = -1;
+          }
+        })
         this.$watch("scaleY", () => {
             this.chartDrawer.scaleY = this.scaleY;
             this.chartDrawer.redraw();
@@ -186,7 +222,7 @@ export default {
                     this.setOffsetX(offsetX);
                 }
             }
-            if (Math.abs(e.deltaY) >= 0.0) {
+            if (Math.abs(e.deltaY) >= 0.0 && this.expand) {
                 if (e.ctrlKey) {
                     let scale = this.scaleY;
                     const lastScale = scale;
@@ -214,7 +250,9 @@ export default {
         down(e) {
             this.drag = true;
         },
+        // handlers for dragging point
         handleDrag(val, e) {
+            this.activate();
             // move points
             const xdiff = LayoutCalculator.movementXToTimeDelta(this.scaleX, e.movementX);
             if (val.timeline.times[val.index] + xdiff < 0) {
@@ -241,6 +279,13 @@ export default {
             // verify effect parameters
             this.adjustMovePoint(val.timeline,val.index);
             this.chartDrawer.redraw();
+        },
+        handleClick(val,e){
+          this.activate();
+          this.selectedTimelineIndex = val.timelineIndex;
+          this.selectedLineIndex = -1;
+          this.selectedPointIndex = val.index;
+          this.chartDrawer.unselectLine();
         },
         // check effect parameters are valid after moving points
         adjustMovePoint(timeline,index){
@@ -279,9 +324,11 @@ export default {
         },
         click(e) {
             this.chartDrawer.onClick();
+            this.activate();
         },
         contextmenu(e){
           e.preventDefault();
+          this.activate();
           this.chartDrawer.onClick();
           const result = this.chartDrawer.hitTest(e.offsetX,e.offsetY);
           if(result && result.betweenPoints){
@@ -294,6 +341,7 @@ export default {
           }
         },
         dblclick(e){
+          this.activate();
           const result = this.chartDrawer.hitTest(e.offsetX,e.offsetY);
           if(result){
             let insertIndex = -1;
@@ -332,6 +380,9 @@ export default {
           });
           timeline.effects.splice(selections.index,1,ne);
           this.chartDrawer.redraw();
+        },
+        activate(){
+          this.$emit("activate");
         },
         ...mapMutations("animation", ["setOffsetX"])
     }

@@ -2,7 +2,7 @@
   <div :class="{'time-view-root':true,'expand':open}">
     <Expander v-model="open"/>
     <TimeViewLabel :model="model" :open="open"/>
-    <Chart :expand="open" :model="model" :offsetY="offsetY" :scaleY="scaleY" @offsetYChanged="offsetYChanged" @scaleYChanged="scaleYChanged"/>
+    <Chart :expand="open" :active="active" :model="model" :offsetY="offsetY" :scaleY="scaleY" @offsetYChanged="offsetYChanged" @scaleYChanged="scaleYChanged" @activate="activate"/>
   </div>
 </template>
 
@@ -12,6 +12,7 @@ import TimeViewLabel from "./timeview-label.vue";
 import Chart from "./timeview-chart.vue";
 import {mapState} from "vuex";
 export default {
+  props:["active"],
   data(){
     return {
       open:false,
@@ -80,6 +81,9 @@ export default {
     },
     scaleYChanged(v){
       this.scaleY = v;
+    },
+    activate(){
+      this.$emit("activate");
     }
   }
 }

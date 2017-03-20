@@ -15,8 +15,8 @@ export default class Bezier{
     const next = args.next;
     const cx1 = LayoutCalculator.timeToScreenX(scaleX,offsetX,effect.control[0],true);
     const cx2 = LayoutCalculator.timeToScreenX(scaleX,offsetX,effect.control[2],true);
-    const cy1 = LayoutCalculator.valueToScreenY(scaleY,offsetY,effect.control[1],true);
-    const cy2 = LayoutCalculator.valueToScreenY(scaleY,offsetY,effect.control[3],true);
+    const cy1 = LayoutCalculator.valueToScreenY(scaleY,offsetY,effect.control[1],true,args.canvasHeight);
+    const cy2 = LayoutCalculator.valueToScreenY(scaleY,offsetY,effect.control[3],true,args.canvasHeight);
     context.bezierCurveTo(cx1,cy1,cx2,cy2,next[0],next[1]);
   }
 

@@ -3,9 +3,10 @@ export default {
     return {};
   },
   BEZIER(args){
+    const middle = (args.next[0] + args.current[0])/2;
     return {
       type:"BEZIER",
-      control:[args.next[0],args.current[1],args.current[0],args.next[1]]
+      control:[middle,args.current[1],middle,args.next[1]]
     };
   }
 };

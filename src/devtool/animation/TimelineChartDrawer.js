@@ -25,30 +25,38 @@ export default class TimeLineChartDrawer {
         this._clear();
         this._drawGrid(this.expand);
         if (this.expand) {
-            this._drawChart();
             this._drawPointer();
-        } else {
-
         }
+        this._drawChart(!this.expand,this.expand);
     }
 
     onClick() {
         const x = this.mouse[0];
         const y = this.mouse[1];
         const result = this.hitTest(x, y);
-        this.selected = result && result.betweenPoints ? [result.timelineIndex, result.index] : null;
-        if (this.selected) {
-            this.selectedLineChanged({
+        if (result) {
+            this.lineClicked({
+                hitTestResult:result,
                 timelineIndex: result.timelineIndex,
                 index: result.index
             });
         } else {
-            this.selectedLineChanged({
+            this.lineClicked({
+                hitTestResult:result,
                 timelineIndex: -1,
                 index: -1
             });
         }
-        this.redraw();
+    }
+
+    selectLine(timelineIndex,index){
+      this.selected = [timelineIndex,index];
+      this.redraw();
+    }
+
+    unselectLine(){
+      this.selected = null;
+      this.redraw();
     }
 
     _clear() {
@@ -103,9 +111,33 @@ export default class TimeLineChartDrawer {
         }
     }
 
-    _drawChart() {
+    _calcMinimapYConfiguration(){
+      let minY = 0;
+      let maxY = 0;
+      for(let i = 0; i < this.timelines.length; i++){
+        const timeline = this.timelines[i];
+        for(let j = 0; j < timeline.values.length; j++){
+          minY = Math.min(minY,timeline.values[j]);
+          maxY = Math.max(maxY,timeline.values[j]);
+        }
+      }
+      return {
+        offsetY: (minY + maxY) /2,
+        scaleY:LayoutCalculator.getScaleYToFitScreenY((maxY - minY)/2.0,this.canvas.height/2)
+      };
+    }
+
+    _drawChart(isMinimap,needHighlightLine) {
         if (!this.timelines) {
             return;
+        }
+        const canvasHeight = this.canvas.height / 2.0;
+        let scaleY = this.scaleY;
+        let offsetY = this.offsetY;
+        if(isMinimap){
+          const minimapConf = this._calcMinimapYConfiguration();
+          scaleY = minimapConf.scaleY;
+          offsetY = minimapConf.offsetY;
         }
         for (let i = 0; i < this.timelines.length; i++) {
             const timeline = this.timelines[i];
@@ -115,7 +147,7 @@ export default class TimeLineChartDrawer {
             for (let j = 0; j < timeline.times.length; j++) {
                 const t = timeline.times[j];
                 const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, t, true);
-                const y = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j], true);
+                const y = LayoutCalculator.valueToScreenY(scaleY, offsetY, timeline.values[j], true,canvasHeight);
                 if (j === 0) {
                     const ix = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, 0, true);
                     this.context.moveTo(ix, y);
@@ -129,34 +161,35 @@ export default class TimeLineChartDrawer {
                         type = e.type;
                     }
                     const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, t, true);
-                    const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j - 1], true);
+                    const y2 = LayoutCalculator.valueToScreenY(scaleY, offsetY, timeline.values[j - 1], true,canvasHeight);
                     Effects[type].drawEffect({
                         context: this.context,
                         scaleX: this.scaleX,
-                        scaleY: this.scaleY,
+                        scaleY: scaleY,
                         offsetX: this.offsetX,
-                        offsetY: this.offsetY,
+                        offsetY: offsetY,
                         effect: e,
                         current: [x2, y2],
-                        next: [x, y]
+                        next: [x, y],
+                        canvasHeight:canvasHeight
                     });
                 }
                 if (j === timeline.times.length - 1) {
-                    const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[j], true);
+                    const y2 = LayoutCalculator.valueToScreenY(scaleY, offsetY, timeline.values[j], true,canvasHeight);
                     this.context.lineTo(this.canvas.width, y2);
                 }
             }
             this.context.stroke();
         }
-        // Draw highlighted lines
-        if (this.selected) {
+        // Draw highlighted line
+        if (this.selected && needHighlightLine) {
             const timeline = this.timelines[this.selected[0]];
             this.context.beginPath();
             this.context.lineWidth = 6;
             this.context.strokeStyle = this.labels[this.selected[0]].color;
             const currentIndex = this.selected[1];
             const x = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex], true);
-            const y = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex], true);
+            const y = LayoutCalculator.valueToScreenY(scaleY, offsetY, timeline.values[currentIndex], true,canvasHeight);
             this.context.moveTo(x, y);
             const e = timeline.effects[currentIndex];
             let type;
@@ -166,16 +199,17 @@ export default class TimeLineChartDrawer {
                 type = e.type;
             }
             const x2 = LayoutCalculator.timeToScreenX(this.scaleX, this.offsetX, timeline.times[currentIndex + 1], true);
-            const y2 = LayoutCalculator.valueToScreenY(this.scaleY, this.offsetY, timeline.values[currentIndex + 1], true);
+            const y2 = LayoutCalculator.valueToScreenY(scaleY, offsetY, timeline.values[currentIndex + 1], true,canvasHeight);
             Effects[type].drawEffect({
                 context: this.context,
                 scaleX: this.scaleX,
-                scaleY: this.scaleY,
+                scaleY: scaleY,
                 offsetX: this.offsetX,
-                offsetY: this.offsetY,
+                offsetY: offsetY,
                 effect: e,
                 current: [x, y],
-                next: [x2, y2]
+                next: [x2, y2],
+                canvasHeight:canvasHeight
             });
             this.context.stroke();
         }

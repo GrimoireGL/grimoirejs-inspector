@@ -69,11 +69,14 @@ export default class LayoutCalculator {
       return isCanvas ? rawTime : rawTime / 2;
     }
 
-    static valueToScreenY(scale,offsetY,value,isCanvas = false){
+    static valueToScreenY(scale,offsetY,value,isCanvas = false,canvasHeight = LayoutCalculator.expandHeight){
       const valueFromMiddle = value - offsetY;
-      const height =  LayoutCalculator.expandHeight;
-      const raw = height - scale * valueFromMiddle * LayoutCalculator.gridScale;
+      const raw = canvasHeight - scale * valueFromMiddle * LayoutCalculator.gridScale;
       return isCanvas ? raw : raw / 2.0;
+    }
+
+    static getScaleYToFitScreenY(yRange,screenY){
+      return screenY / (yRange * LayoutCalculator.gridScale);
     }
 
     static screenXToTime(scale,offsetX,screenX,isCanvas = false){
@@ -82,9 +85,9 @@ export default class LayoutCalculator {
       return isCanvas ? rawScreenX : rawScreenX * 2;
     }
 
-    static screenYToValue(scale,offsetY,screenY,isCanvas = false){
+    static screenYToValue(scale,offsetY,screenY,isCanvas = false,canvasHeight = LayoutCalculator.expandHeight){
       const scaled = LayoutCalculator.valueToScreenY(scale,0,1);
-      const height =  LayoutCalculator.expandHeight * (isCanvas ? 1: 0.5);
+      const height =  canvasHeight * (isCanvas ? 1: 0.5);
       const rawScreenX = offsetY + (height - screenY) / scaled;
       return isCanvas ? rawScreenX : rawScreenX * 2;
     }
