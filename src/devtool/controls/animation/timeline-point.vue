@@ -1,5 +1,5 @@
 <template lang="html">
-  <svg :style="style" class="chart-point" width="12" height="12" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" v-on:mouseover="over" v-on:mouseout="out" v-on:mousedown="down">
+  <svg :style="style" class="chart-point" width="12" height="12" xmlns="http://www.w3.org/2000/svg" xmlns:svg="http://www.w3.org/2000/svg" @mouseover="over" @mouseout="out" @mousedown="down" @click="click">
    <g>
     <title>{{value}}</title>
       <g id="svg_2">
@@ -15,10 +15,14 @@ export default {
   data(){
     return {
       mouseon:false,
-      mousehold:false
+      mousehold:false,
+      selected:false
     };
   },
   computed:{
+    strokeColor(){
+      return this.selected ? "orange" :"black";
+    },
     strokeWidth(){
       return this.mouseon ? 2: 1;
     },
@@ -41,6 +45,9 @@ export default {
     },
     down(){
       this.mousehold = true;
+    },
+    click(){
+      this.$emit("click");
     }
   },
   mounted(){

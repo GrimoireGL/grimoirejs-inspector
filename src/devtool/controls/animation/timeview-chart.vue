@@ -9,9 +9,9 @@
     <canvas :style="canvasStyle" ref="chart" class="animation-chart" @wheel.prevent="wheel" @mousemove="move" @mousedown="down" @click="click" @dblclick="dblclick" @contextmenu="contextmenu"/>
     <div class="timeview-chart-points" v-if="expand">
       <div v-for="(value,index) in points">
-          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" @drag="handleDrag(value,$event)" size="4"/>
+          <Point :color="value.color" :left="value.left" :top="value.top" :value="value.value" @drag="handleDrag(value,$event)" @click="handleClick(value,$event)" size="4"/>
       </div>
-      <components v-if="selection" :is="selection.control" :effect="selection.effect" :p1="selection.p1" :p2="selection.p2" :offsetY="offsetY" :scaleY="scaleY" @effectChanged="effectChanged(selection,$event)"/>
+      <components v-if="selectedEffect" :is="selectedEffect.control" :effect="selectedEffect.effect" :p1="selectedEffect.p1" :p2="selectedEffect.p2" :offsetY="offsetY" :scaleY="scaleY" @effectChanged="effectChanged(selectedEffect,$event)"/>
     </div>
   </div>
 </div>
@@ -42,12 +42,25 @@ export default {
             onChartLine: false,
             selectedTimelineIndex: -1,
             selectedLineIndex: -1,
+            selectedPoint: -1,
             popupPosition:[0,0],
             popupOpen:false,
-            currentPopupSelection:null
+            currentPopupSelection:null,
         }
     },
     computed: {
+        selectedType(){
+          if(this.selectedTimelineIndex === -1){
+            return null;
+          }else{
+            if(this.selectedPoint !== -1){
+              return "point";
+            }
+            else{
+              return "line";
+            }
+          }
+        },
         canvasStyle() {
             return {
                 cursor: (this.onChartLine ? "pointer" : "default"),
@@ -80,7 +93,7 @@ export default {
             }
             return arr;
         },
-        selection() {
+        selectedEffect() {
             if (this.selectedTimelineIndex >= 0 && this.selectedLineIndex >= 0) {
                 const timeline = this.model.timelines[this.selectedTimelineIndex];
                 const effect = timeline.effects[this.selectedLineIndex];
@@ -102,40 +115,11 @@ export default {
                 return null;
             }
         },
-        effects() {
-            const arr = [];
-            for (let i = 0; i < this.model.labels.length; i++) {
-                const label = this.model.labels[i];
-                const timeline = this.model.timelines[i];
-                for (let j = 0; j < timeline.effects.length; j++) {
-                    const effect = timeline.effects[j];
-                    if (!effect || !effect.type) {
-                        continue;
-                    }
-                    const effectControl = Effects[effect.type].optionalControl;
-                    if (effectControl === null) {
-                        continue;
-                    }
-                    const p1 = [timeline.times[j], timeline.values[j]];
-                    const p2 = [timeline.times[j + 1], timeline.values[j + 1]];
-                    arr.push({
-                        control: effectControl,
-                        effect: effect,
-                        timeline: timeline,
-                        index: j,
-                        p1: p1,
-                        p2: p2
-                    });
-                }
-            }
-            return arr;
-        },
         ...mapState("animation", ["offsetX", "scaleX"])
     },
     mounted() {
         document.addEventListener("mouseup", (e) => {
             this.drag = false;
-
         });
         document.addEventListener("mousedown",(e)=>{
             this.popupOpen = false;
@@ -230,9 +214,6 @@ export default {
         down(e) {
             this.drag = true;
         },
-        calcDisplayPx(t) {
-            return LayoutCalculator.timeToScreenX(t) + "px";
-        },
         handleDrag(val, e) {
             // move points
             const xdiff = LayoutCalculator.movementXToTimeDelta(this.scaleX, e.movementX);
@@ -261,6 +242,7 @@ export default {
             this.adjustMovePoint(val.timeline,val.index);
             this.chartDrawer.redraw();
         },
+        // check effect parameters are valid after moving points
         adjustMovePoint(timeline,index){
           if (index > 0) { // previous effect
               const effect = timeline.effects[index - 1];
